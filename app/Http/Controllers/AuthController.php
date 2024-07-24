@@ -925,11 +925,8 @@ public function add_trip(Request $request)
 {
     $user_id = $request->input('user_id'); 
     $trip_type = $request->input('trip_type');
-    $from_date = $request->input('from_date');
-    $to_date = $request->input('to_date');
     $trip_title = $request->input('trip_title');
     $trip_description = $request->input('trip_description');
-    $location = $request->input('location');
 
     $errors = [];
 
@@ -938,19 +935,6 @@ public function add_trip(Request $request)
         return response()->json([
             'success' => false,
             'message' => 'Trip Type is empty.',
-        ], 400);
-    }
-    if (empty($from_date)) {
-        return response()->json([
-            'success' => false,
-            'message' => 'From Date is empty.',
-        ], 400);
-    }
-          
-    if (empty($to_date)) {
-        return response()->json([
-            'success' => false,
-            'message' => 'To Date is empty.',
         ], 400);
     }
             
@@ -964,12 +948,6 @@ public function add_trip(Request $request)
         return response()->json([
             'success' => false,
             'message' => 'Trip Description is empty.',
-        ], 400);
-    }
-    if (empty($location)) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Location is empty.',
         ], 400);
     }
 
@@ -1001,11 +979,8 @@ public function add_trip(Request $request)
    $trip = new trips();
    $trip->user_id = $user_id;
    $trip->trip_type = $trip_type;
-   $trip->from_date = Carbon::parse($from_date)->format('Y-m-d');
-   $trip->to_date = Carbon::parse($to_date)->format('Y-m-d');
    $trip->trip_title = $trip_title;
    $trip->trip_description = $trip_description;
-   $trip->location = $location;
    $trip->trip_datetime = now();
    $trip->save();
 
@@ -1039,12 +1014,9 @@ public function add_trip(Request $request)
             'unique_name' => $user->unique_name,
             'verified' => $user->verified,
             'trip_type' => $trip->trip_type,
-            'from_date' => date('F j, Y', strtotime($trip->from_date)),
-            'to_date' => date('F j, Y', strtotime($trip->to_date)),
             'time' => $timeDifference, 
             'trip_title' => $trip->trip_title,
             'trip_description' => $trip->trip_description,
-            'location' => $trip->location,
             'trip_status' => 0,
             'trip_image' => $imageUrl,
             'trip_datetime' => Carbon::parse($trip->trip_datetime)->format('Y-m-d H:i:s'),
@@ -1333,12 +1305,9 @@ public function trip_list(Request $request)
             'profile' => $imageUrl,
             'cover_image' => $coverimageUrl,
             'trip_type' => $trip->trip_type,
-            'from_date' => date('F j, Y', strtotime($trip->from_date)),
-            'to_date' => date('F j, Y', strtotime($trip->to_date)),
             'time' => $timeDifference,
             'trip_title' => $trip->trip_title,
             'trip_description' => $trip->trip_description,
-            'location' => $trip->location,
             'trip_status' => $trip->trip_status,
             'trip_image' => $tripimageUrl,
             'trip_datetime' => Carbon::parse($trip->trip_datetime)->format('Y-m-d H:i:s'),
@@ -1351,288 +1320,6 @@ public function trip_list(Request $request)
         'success' => true,
         'message' => 'Trip details retrieved successfully.',
         'total' => $totalTrips,
-        'data' => $tripDetails,
-    ], 200);
-}
-
-public function my_trip_list(Request $request)
-{
-    // Get the user_id from the request
-    $user_id = $request->input('user_id');
-
-    // Get offset and limit from request with default values
-    $offset = $request->has('offset') ? $request->input('offset') : 0; // Default offset is 0 if not provided
-    $limit = $request->has('limit') ? $request->input('limit') : 10; // Default limit is 10 if not provided
-
-    // Validate offset
-    if (!is_numeric($offset)) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Offset is empty.',
-        ], 400);
-    }
-
-    // Validate limit
-    if (!is_numeric($limit)) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Limit is empty.',
-        ], 400);
-    }
-
-    // Convert offset and limit to integers
-    $offset = (int)$offset;
-    $limit = (int)$limit;
-
-    $totalTrips = Trips::where('user_id', $user_id)->count();
-
-          // If offset is beyond the total chats, set offset to 0
-          if ($offset >= $totalTrips) {
-            $offset = 0;
-        } 
-
-    // Fetch trips for the specific user_id from the database with pagination
-    $trips = Trips::where('user_id', $user_id)
-        ->skip($offset)
-        ->take($limit)
-        ->get();
-
-
-
-    if ($trips->isEmpty()) {
-        return response()->json([
-            'success' => false,
-            'message' => 'No trips found.',
-        ], 404);
-    }
-
-    $tripDetails = [];
-
-    foreach ($trips as $trip) {
-        $user = Users::find($trip->user_id);
-        if ($user) {
-            $imageUrl = asset('storage/app/public/users/' . $user->profile);
-            $coverimageUrl = asset('storage/app/public/users/' . $user->cover_img);
-        } else {
-            $imageUrl = null; // Set default image URL if user not found
-            $coverimageUrl = null; // Set default image URL if user not found
-        }
-
-        // Calculate time difference in hours
-        $tripTime = Carbon::parse($trip->trip_datetime);
-        $currentTime = Carbon::now();
-        $hoursDifference = $tripTime->diffInHours($currentTime);
-
-        // Determine the time display string
-        if ($hoursDifference == 0) {
-            $timeDifference = 'now';
-        } elseif ($hoursDifference < 24) {
-            $timeDifference = $hoursDifference . 'h';
-        } else {
-            $daysDifference = floor($hoursDifference / 24);
-            $timeDifference = $daysDifference . 'd';
-        }
-
-        $tripimageUrl = asset('storage/app/public/trips/' . $trip->trip_image);
-
-        $tripDetails[] = [
-            'id' => $trip->id,
-            'user_id' => $trip->user_id,
-            'name' => $user->name,
-            'verified' => $user->verified,
-            'unique_name' => $user->unique_name,
-            'profile' => $imageUrl,
-            'cover_image' => $coverimageUrl,
-            'trip_type' => $trip->trip_type,
-            'from_date' => date('F j, Y', strtotime($trip->from_date)),
-            'to_date' => date('F j, Y', strtotime($trip->to_date)),
-            'time' => $timeDifference,
-            'trip_title' => $trip->trip_title,
-            'trip_description' => $trip->trip_description,
-            'location' => $trip->location,
-            'trip_status' => $trip->trip_status,
-            'trip_image' => $tripimageUrl,
-            'trip_datetime' => Carbon::parse($trip->trip_datetime)->format('Y-m-d H:i:s'),
-            'updated_at' => Carbon::parse($trip->updated_at)->format('Y-m-d H:i:s'),
-            'created_at' => Carbon::parse($trip->created_at)->format('Y-m-d H:i:s'),
-        ];
-    }
-
-    return response()->json([
-        'success' => true,
-        'message' => 'Trip details retrieved successfully.',
-        'total' => $totalTrips,
-        'data' => $tripDetails,
-    ], 200);
-}
-
-public function trip_date(Request $request)
-{
-    // Get the date from the request
-    $date = $request->input('date');
-
-    // Validate the date input
-    if (empty($date)) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Date is empty.',
-        ], 400);
-    }
-
-    // Check if the date is in a valid format (YYYY-MM-DD)
-    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Invalid date format. Expected format: YYYY-MM-DD.',
-        ], 400);
-    }
-
-    // Fetch trips for the specific date from the database, comparing only the date part of the datetime field
-    $trips = Trips::whereDate('trip_datetime', $date)->get();
-
-    if ($trips->isEmpty()) {
-        return response()->json([
-            'success' => false,
-            'message' => 'No trips found for this date.',
-        ], 404);
-    }
-
-    $tripDetails = [];
-
-   
-    foreach ($trips as $trip) {
-        $user = Users::find($trip->user_id);
-        if ($user) {
-            // Image URL
-            $imageUrl = $user->profile_verified == 1 ? asset('storage/app/public/users/' . $user->profile) : '';
-            $coverimageUrl = $user->cover_img_verified == 1 ? asset('storage/app/public/users/' . $user->cover_img) : '';
-            
-        } else {
-            $imageUrl = null; // Set default image URL if user not found
-        }
-       // Calculate time difference in hours
- $tripTime = Carbon::parse($trip->trip_datetime);
- $currentTime = Carbon::now();
- $hoursDifference = $tripTime->diffInHours($currentTime);
- 
- // Determine the time display string
- if ($hoursDifference == 0) {
-     $timeDifference = 'now';
- } elseif ($hoursDifference < 24) {
-     $timeDifference = $hoursDifference . 'h';
- } else {
-     $daysDifference = floor($hoursDifference / 24);
-     $timeDifference = $daysDifference . 'd';
- }
-
-
-        $tripimageUrl = asset('storage/app/public/trips/' . $trip->trip_image);
-
-        $tripDetails[] = [
-            'id' => $trip->id,
-            'user_id' => $trip->user_id,
-            'name' => $user->name,
-            'verified' => $user->verified,
-            'unique_name' => $user->unique_name,
-            'profile' => $imageUrl,
-            'cover_image' => $coverimageUrl,
-            'trip_type' => $trip->trip_type,
-            'from_date' => date('F j, Y', strtotime($trip->from_date)),
-            'to_date' => date('F j, Y', strtotime($trip->to_date)),
-            'time' => $timeDifference, 
-            'trip_title' => $trip->trip_title,
-            'trip_description' => $trip->trip_description,
-            'location' => $trip->location,
-            'trip_status' => $trip->trip_status,
-            'trip_image' => $tripimageUrl,
-            'trip_datetime' => Carbon::parse($trip->trip_datetime)->format('Y-m-d H:i:s'),
-            'updated_at' => Carbon::parse($trip->updated_at)->format('Y-m-d H:i:s'),
-            'created_at' => Carbon::parse($trip->created_at)->format('Y-m-d H:i:s'),
-        ];
-    }
-    
-
-    return response()->json([
-        'success' => true,
-        'message' => 'Trip details retrieved successfully.',
-        'data' => $tripDetails,
-    ], 200);
-}
-
-public function latest_trip(Request $request)
-{
-    // Get the type from the request
-    $type = $request->input('type');
-
-    // Validate the type input
-    if (empty($type)) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Type is empty.',
-        ], 400);
-    }
-
-    if ($type == 'latest') {
-        // Fetch the most recently added trip
-        $trip = Trips::orderBy('created_at', 'desc')->first();
-    } else {
-        // Fetch the latest trip for the specified type
-        $trip = Trips::where('type', $type)->orderBy('created_at', 'desc')->first();
-    }
-
-    if (!$trip) {
-        return response()->json([
-            'success' => false,
-            'message' => 'No trips found.',
-        ], 404);
-    }
-
-    $user = Users::find($trip->user_id);
-    
- // Calculate time difference in hours
- $tripTime = Carbon::parse($trip->trip_datetime);
- $currentTime = Carbon::now();
- $hoursDifference = $tripTime->diffInHours($currentTime);
- 
- // Determine the time display string
- if ($hoursDifference == 0) {
-     $timeDifference = 'now';
- } elseif ($hoursDifference < 24) {
-     $timeDifference = $hoursDifference . 'h';
- } else {
-     $daysDifference = floor($hoursDifference / 24);
-     $timeDifference = $daysDifference . 'd';
- }
-
-
-    // Image URL
-    $userProfileUrl = $user ? asset('storage/app/public/users/' . $user->profile) : null;
-    $tripimageUrl = $trip ? asset('storage/app/public/trips/' . $trip->trip_image) : null;
-
-    $tripDetails[] = [
-        'id' => $trip->id,
-        'user_id' => $trip->user_id,
-        'name' => $user ? $user->name : 'Unknown',
-        'verified' => $user->verified,
-        'unique_name' => $user ? $user->unique_name : 'Unknown',
-        'profile' => $userProfileUrl,
-        'trip_type' => $trip->trip_type,
-        'from_date' => date('F j, Y', strtotime($trip->from_date)),
-        'to_date' => date('F j, Y', strtotime($trip->to_date)),
-        'time' => $timeDifference, 
-        'trip_title' => $trip->trip_title,
-        'trip_description' => $trip->trip_description,
-        'location' => $trip->location,
-        'trip_status' => $trip->trip_status,
-        'trip_image' => $tripimageUrl,
-        'trip_datetime' => Carbon::parse($trip->trip_datetime)->format('Y-m-d H:i:s'),
-        'updated_at' => Carbon::parse($trip->updated_at)->format('Y-m-d H:i:s'),
-        'created_at' => Carbon::parse($trip->created_at)->format('Y-m-d H:i:s'),
-    ];
-
-    return response()->json([
-        'success' => true,
-        'message' => 'Trip details retrieved successfully.',
         'data' => $tripDetails,
     ], 200);
 }

@@ -82,9 +82,6 @@
                         <th>Trip Image</th>
                         <th>User Name <i class="fas fa-sort"></i></th>
                         <th>Trip Type <i class="fas fa-sort"></i></th>
-                        <th>Location <i class="fas fa-sort"></i></th>
-                        <th>From Date <i class="fas fa-sort"></i></th>
-                        <th>To Date <i class="fas fa-sort"></i></th>
                         <th>Trip Title<i class="fas fa-sort"></i></th>
                         <th>Trip Description<i class="fas fa-sort"></i></th>
                         <th>Trip Status</th>
@@ -107,9 +104,6 @@
                             </td>
                             <td>{{ optional($trip->user)->name }}</td>
                             <td>{{ $trip->trip_type }}</td>
-                            <td>{{ $trip->location }}</td>
-                            <td>{{ $trip->from_date }}</td>
-                            <td>{{ $trip->to_date }}</td>
                             <td>{{ $trip->trip_title }}</td>
                             <td>{{ $trip->trip_description }}</td>
                             <td>

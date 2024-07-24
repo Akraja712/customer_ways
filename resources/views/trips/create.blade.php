@@ -43,41 +43,6 @@
                     </span>
                     @enderror
                 </div>
-
-
-                <div class="form-group">
-                    <label for="location">Location</label>
-                    <input type="text" name="location" class="form-control @error('location') is-invalid @enderror"
-                           id="location"
-                           placeholder="From Location" value="{{ old('location') }}">
-                    @error('location')
-                    <span class="invalid-feedback" role="alert">
-                        <strong>{{ $message }}</strong>
-                    </span>
-                    @enderror
-                </div>
-
-                <div class="form-group">
-                    <label for="date">From Date</label>
-                    <input type="date" name="from_date" class="form-control @error('from_date') is-invalid @enderror" id="mobile"
-                           placeholder="From Date" value="{{ old('from_date') }}">
-                    @error('from_date')
-                    <span class="invalid-feedback" role="alert">
-                        <strong>{{ $message }}</strong>
-                    </span>
-                    @enderror
-                </div>
-            
-                <div class="form-group">
-                    <label for="date">To Date</label>
-                    <input type="date" name="to_date" class="form-control @error('to_date') is-invalid @enderror" id="mobile"
-                           placeholder="To Date" value="{{ old('to_date') }}">
-                    @error('to_date')
-                    <span class="invalid-feedback" role="alert">
-                        <strong>{{ $message }}</strong>
-                    </span>
-                    @enderror
-                </div>
                 
                 <div class="form-group">
                     <label for="trip_title">Trip Title</label>

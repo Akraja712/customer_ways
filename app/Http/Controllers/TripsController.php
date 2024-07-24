@@ -153,9 +153,6 @@ class TripsController extends Controller
 }
         $trips = Trips::create([
             'trip_type' => $request->trip_type,
-            'location' => $request->location,
-            'from_date' => $request->from_date,
-            'to_date' => $request->to_date,
             'trip_title' => $request->trip_title,
             'trip_description' => $request->trip_description,
             'user_id' => $request->user_id,
@@ -211,19 +208,13 @@ class TripsController extends Controller
     {
 
         $request->validate([
-            'from_date' => 'required|date',
-            'to_date' => 'required|date',
             'trip_type' => 'required|string',
-            'location' => 'required|string',
             'trip_title' => 'required|string',
             'trip_description' => 'required|string',
             'user_id' => 'required|exists:users,id',
         ]);
         
         $trips->trip_type = $request->trip_type;
-        $trips->location = $request->location;
-        $trips->from_date = $request->from_date;
-        $trips->to_date = $request->to_date;
         $trips->trip_title = $request->trip_title;
         $trips->trip_description = $request->trip_description;
         $trips->user_id = $request->user_id;
