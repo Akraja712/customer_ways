@@ -21,7 +21,7 @@
     <center>
 <img src="{{ asset('public/images/poslg.png') }}"  alt="Image description" class="rounded-circle" style="max-width: 100px; max-height: 100px;">
 </center>
-<h5 class="login-box-msg">Dude Ways - Login Page</h5>
+<h5 class="login-box-msg">Customer Ways - Login Page</h5>
 <br>
     @csrf
     <div class="form-group">
