@@ -1121,6 +1121,13 @@ public function my_trip_list(Request $request)
     $offset = $request->has('offset') ? $request->input('offset') : 0; // Default offset is 0 if not provided
     $limit = $request->has('limit') ? $request->input('limit') : 10; // Default limit is 10 if not provided
 
+    if (empty($user_id)) {
+        return response()->json([
+            'success' => false,
+            'message' => 'user_id is empty.',
+        ], 400);
+    }
+    
     // Validate offset
     if (!is_numeric($offset)) {
         return response()->json([
