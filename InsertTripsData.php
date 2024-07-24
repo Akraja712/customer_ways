@@ -25,7 +25,7 @@ $data = [
     'trip_image' => 'SnXxFLBKoQslEfdyXjAzVvfoHHtT61C6bcJNnXhb.jpg',
 ];
 
-$numberOfInserts = 50;
+$numberOfInserts = 10;
 
 for ($i = 0; $i < $numberOfInserts; $i++) {
     // Randomly select a trip type
