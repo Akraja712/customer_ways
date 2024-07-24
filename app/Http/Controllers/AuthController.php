@@ -1112,6 +1112,114 @@ public function trip_list(Request $request)
     ], 200);
 }
 
+public function my_trip_list(Request $request)
+{
+    // Get the user_id from the request
+    $user_id = $request->input('user_id');
+
+    // Get offset and limit from request with default values
+    $offset = $request->has('offset') ? $request->input('offset') : 0; // Default offset is 0 if not provided
+    $limit = $request->has('limit') ? $request->input('limit') : 10; // Default limit is 10 if not provided
+
+    // Validate offset
+    if (!is_numeric($offset)) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Offset is empty.',
+        ], 400);
+    }
+
+    // Validate limit
+    if (!is_numeric($limit)) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Limit is empty.',
+        ], 400);
+    }
+
+    // Convert offset and limit to integers
+    $offset = (int)$offset;
+    $limit = (int)$limit;
+
+    $totalTrips = Trips::where('user_id', $user_id)->count();
+
+          // If offset is beyond the total chats, set offset to 0
+          if ($offset >= $totalTrips) {
+            $offset = 0;
+        } 
+
+    // Fetch trips for the specific user_id from the database with pagination
+    $trips = Trips::where('user_id', $user_id)
+        ->skip($offset)
+        ->take($limit)
+        ->get();
+
+
+
+    if ($trips->isEmpty()) {
+        return response()->json([
+            'success' => false,
+            'message' => 'No trips found.',
+        ], 404);
+    }
+
+    $tripDetails = [];
+
+    foreach ($trips as $trip) {
+        $user = Users::find($trip->user_id);
+        if ($user) {
+            $imageUrl = asset('storage/app/public/users/' . $user->profile);
+            $coverimageUrl = asset('storage/app/public/users/' . $user->cover_img);
+        } else {
+            $imageUrl = null; // Set default image URL if user not found
+            $coverimageUrl = null; // Set default image URL if user not found
+        }
+
+        // Calculate time difference in hours
+        $tripTime = Carbon::parse($trip->trip_datetime);
+        $currentTime = Carbon::now();
+        $hoursDifference = $tripTime->diffInHours($currentTime);
+
+        // Determine the time display string
+        if ($hoursDifference == 0) {
+            $timeDifference = 'now';
+        } elseif ($hoursDifference < 24) {
+            $timeDifference = $hoursDifference . 'h';
+        } else {
+            $daysDifference = floor($hoursDifference / 24);
+            $timeDifference = $daysDifference . 'd';
+        }
+
+        $tripimageUrl = asset('storage/app/public/trips/' . $trip->trip_image);
+
+        $tripDetails[] = [
+            'id' => $trip->id,
+            'user_id' => $trip->user_id,
+            'name' => $user->name,
+            'verified' => $user->verified,
+            'unique_name' => $user->unique_name,
+            'profile' => $imageUrl,
+            'cover_image' => $coverimageUrl,
+            'trip_type' => $trip->trip_type,
+            'time' => $timeDifference,
+            'trip_title' => $trip->trip_title,
+            'trip_description' => $trip->trip_description,
+            'trip_status' => $trip->trip_status,
+            'trip_image' => $tripimageUrl,
+            'trip_datetime' => Carbon::parse($trip->trip_datetime)->format('Y-m-d H:i:s'),
+            'updated_at' => Carbon::parse($trip->updated_at)->format('Y-m-d H:i:s'),
+            'created_at' => Carbon::parse($trip->created_at)->format('Y-m-d H:i:s'),
+        ];
+    }
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Trip details retrieved successfully.',
+        'total' => $totalTrips,
+        'data' => $tripDetails,
+    ], 200);
+}
+
 
 public function delete_trip(Request $request)
 {
