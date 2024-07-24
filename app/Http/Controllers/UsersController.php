@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UsersStoreRequest;
 use App\Models\Users;
-use App\Models\Professions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -23,8 +22,7 @@ class UsersController extends Controller
         if ($request->filled('search')) {
             $search = $request->input('search');
             $query->where('unique_name', 'like', "%$search%")
-                  ->orWhere('name', 'like', "%$search%")
-                  ->orWhere('email', 'like', "%$search%");
+                  ->orWhere('name', 'like', "%$search%");
         }
 
 
@@ -45,14 +43,10 @@ class UsersController extends Controller
 
         // Retrieve all users if there's no search query
         $users = $query->latest()->paginate(10);
-        $professions = Professions::all();
      
-        return view('users.index', compact('users', 'professions'));
+        return view('users.index', compact('users'));
     }
-    public function profession()
-{
-    return $this->belongsTo(Professions::class, 'profession_id');
-}
+  
 
     /**
      * Show the form for creating a new resource.
@@ -61,8 +55,7 @@ class UsersController extends Controller
      */
     public function create()
     {
-          $professions = Professions::pluck('profession', 'id'); // Pluck only 'profession' field
-        return view('users.create', compact('professions'));
+        return view('users.create');
     }
 
     /**
@@ -90,17 +83,8 @@ class UsersController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'email' => 'required|email|unique:users',
-           'profession_id' => 'required|integer|exists:professions,id',
-            'city' => 'required|string|max:255',
-            'state' => 'required|string|max:255',
-            'age' => 'required|integer|between:18,60',
-            'gender' => 'required|in:male,female,others',
             'profile' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ], [
-            'email.unique' => 'The email has already been taken.',
-            'age.between' => 'The age must be between 18 and 60.',
-            'gender.in' => 'Invalid gender selected.',
             'profile.image' => 'The profile must be an image file.',
             'profile.mimes' => 'The profile must be a file of type: jpeg, png, jpg, gif.',
         ]);
@@ -136,13 +120,8 @@ if ($request->hasFile('cover_img')) {
     
         $users = Users::create([
             'name' => $request->name,
-            'age' => $request->age,
-            'email' => $request->email,
+            'mobile' => $request->mobile,
             'address' => $request->address,
-            'gender' => $request->gender,
-            'state' => $request->state,
-            'city' => $request->city,
-            'profession_id' => $request->profession_id,
             'refer_code' => $refer_code,
             'referred_by' => $request->referred_by,
             'dummy' => $request->dummy,
@@ -195,8 +174,7 @@ private function generateUniqueName($name, $user_id)
      */
     public function edit(Users $users)
     {
-        $professions = Professions::pluck('profession', 'id'); // Replace 'profession' with the actual field name
-        return view('users.edit', compact('users', 'professions'));
+        return view('users.edit');
     }
 
     /**
@@ -212,12 +190,6 @@ private function generateUniqueName($name, $user_id)
         $validatedData = $request->validate([
             'unique_name' => 'required|string|max:255|unique:users,unique_name,' . $users->id,
             'name' => 'required|string|max:255',
-            'age' => 'required|integer|between:18,60',
-            'email' => 'required|email|unique:users,email,' . $users->id,
-            'gender' => 'required|in:male,female,others',
-            'state' => 'required|string|max:255',
-            'city' => 'required|string|max:255',
-            'profession_id' => 'required|integer|exists:professions,id',
             'refer_code' => 'nullable|string|max:255',
             'referred_by' => 'nullable|string|max:255',
             'profile' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -226,10 +198,6 @@ private function generateUniqueName($name, $user_id)
             // other validation rules...
         ], [
             'unique_name.unique' => 'The unique name has already been taken.',
-            'email.unique' => 'The email has already been taken.',
-        
-            'age.between' => 'The age must be between 18 and 60.',
-            'gender.in' => 'Invalid gender selected.',
             'profile.image' => 'The profile must be an image file.',
             'profile.mimes' => 'The profile must be a file of type: jpeg, png, jpg, gif.',
             'profile.max' => 'The profile may not be greater than 2 MB.',
@@ -240,13 +208,8 @@ private function generateUniqueName($name, $user_id)
     
     
         $users->name = $request->name;
+        $users->mobile = $request->mobile;
         $users->unique_name = $request->unique_name;
-        $users->age = $request->age;
-        $users->email = $request->email;
-        $users->gender = $request->gender;
-        $users->state = $request->state;
-        $users->city = $request->city;
-        $users->profession_id = $request->profession_id;
         $users->refer_code = $request->refer_code;
         $users->referred_by = $request->referred_by;
         $users->verified = $request->verified;

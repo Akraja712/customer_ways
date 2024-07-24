@@ -24,85 +24,19 @@
                     </span>
                     @enderror
                 </div>
+
+                <div class="form-group">
+                    <label for="mobile">Mobile</label>
+                    <input type="number" name="mobile" class="form-control @error('mobile') is-invalid @enderror"
+                           id="mobile"
+                           placeholder="mobile" value="{{ old('mobile') }}">
+                    @error('mobile')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ $message }}</strong>
+                    </span>
+                    @enderror
+                </div>
             
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="text" name="email" class="form-control @error('email') is-invalid @enderror" id="email"
-                           placeholder="Email" value="{{ old('email') }}">
-                    @error('email')
-                    <span class="invalid-feedback" role="alert">
-                        <strong>{{ $message }}</strong>
-                    </span>
-                    @enderror
-                </div>
-                
-                <div class="form-group">
-                    <label for="age">Age</label>
-                    <input type="text" name="age" class="form-control @error('age') is-invalid @enderror" id="age"
-                           placeholder="age" value="{{ old('age') }}">
-                    @error('age')
-                    <span class="invalid-feedback" role="alert">
-                        <strong>{{ $message }}</strong>
-                    </span>
-                    @enderror
-                 </div>
-
-                <div class="form-group">
-                    <label for="gender">Gender</label>
-                    <select name="gender" class="form-control @error('gender') is-invalid @enderror" id="gender">
-                        <option value=''>--select--</option>
-                        <option value='male' {{ old('gender') == 'male' ? 'selected' : '' }}>male</option>
-                        <option value='female' {{ old('gender') == 'female' ? 'selected' : '' }}>female</option>
-                        <option value='others' {{ old('gender') == 'others' ? 'selected' : '' }}>others</option>
-                    </select>
-                    @error('gender')
-                    <span class="invalid-feedback" role="alert">
-                        <strong>{{ $message }}</strong>
-                    </span>
-                    @enderror
-                </div>
-
-                <div class="form-group">
-                    <label for="state">State</label>
-                    <input type="text" name="state" class="form-control @error('state') is-invalid @enderror" id="state"
-                           placeholder="state" value="{{ old('state') }}">
-                    @error('state')
-                    <span class="invalid-feedback" role="alert">
-                        <strong>{{ $message }}</strong>
-                    </span>
-                    @enderror
-                </div>
-
-                <div class="form-group">
-                    <label for="city">City</label>
-                    <input type="text" name="city" class="form-control @error('city') is-invalid @enderror" id="city"
-                           placeholder="city" value="{{ old('city') }}">
-                    @error('city')
-                    <span class="invalid-feedback" role="alert">
-                        <strong>{{ $message }}</strong>
-                    </span>
-                    @enderror
-                </div>
-
-                <div class="form-group">
-    <label for="profession_id">Profession</label>
-    <select name="profession_id" class="form-control @error('profession_id') is-invalid @enderror" id="profession_id">
-        <option value=''>--select--</option>
-        @foreach($professions as $id => $profession)
-            <option value="{{ $id }}" {{ old('profession_id') == $id ? 'selected' : '' }}>
-                {{ $profession }}
-            </option>
-        @endforeach
-    </select>
-    @error('profession_id')
-    <span class="invalid-feedback" role="alert">
-        <strong>{{ $message }}</strong>
-    </span>
-    @enderror
-</div>
-
-
-
                 <div class="form-group">
     <label for="referred_by">Referred By</label>
     <input type="text" name="referred_by" class="form-control @error('referred_by') is-invalid @enderror" id="referred_by"

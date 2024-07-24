@@ -42,12 +42,6 @@
                     </a>
                 </li>
                 <li class="nav-item has-treeview">
-                    <a href="{{ route('professions.index') }}" class="nav-link {{ activeSegment('professions') }}">
-                    <i class="nav-icon fas fa-user-md"></i>
-                        <p>Professions</p>
-                    </a>
-                </li>
-                <li class="nav-item has-treeview">
                     <a href="{{ route('trips.index') }}" class="nav-link {{ activeSegment('trips') }}">
                         <i class="nav-icon fas fa-suitcase"></i>
                         <p>Trips</p>

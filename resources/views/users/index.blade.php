@@ -58,13 +58,7 @@
                     <th>Cover Image</th>
                     <th>Name <i class="fas fa-sort"></i></th>
                     <th>Unique Name <i class="fas fa-sort"></i></th>
-                    <th>Email <i class="fas fa-sort"></i></th>
                     <th>Mobile <i class="fas fa-sort"></i></th>
-                    <th>Age <i class="fas fa-sort"></i></th>
-                    <th>Gender <i class="fas fa-sort"></i></th>
-                    <th>State <i class="fas fa-sort"></i></th>
-                    <th>City <i class="fas fa-sort"></i></th>
-                    <th>Profession <i class="fas fa-sort"></i></th>
                     <th>Refer Code <i class="fas fa-sort"></i></th>
                     <th>Referred By <i class="fas fa-sort"></i></th>
                     <th>Points <i class="fas fa-sort"></i></th>
@@ -113,14 +107,7 @@
 </td>
                         <td>{{$user->name}}</td>
                         <td>{{$user->unique_name}}</td>
-                        <td>{{$user->email}}</td>
                         <td>{{$user->mobile}}</td>
-                        <td>{{$user->age}}</td>
-                        <td>{{$user->gender}}</td>
-                        <td>{{$user->state}}</td>
-                        <td>{{$user->city}}</td>
-                        <td>{{ optional($user->professions)->profession }}</td>
-
                         <td>{{$user->refer_code}}</td>
                         <td>{{$user->referred_by}}</td>
                         <td>{{$user->points}}</td>

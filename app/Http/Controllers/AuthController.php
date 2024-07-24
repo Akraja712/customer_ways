@@ -13,7 +13,6 @@ use App\Models\Notifications;
 use App\Models\Verifications; 
 use App\Models\Transaction; 
 use App\Models\Feedback; 
-use App\Models\Professions; 
 use App\Models\RechargeTrans; 
 use App\Models\News; 
 use Carbon\Carbon;
@@ -71,13 +70,7 @@ class AuthController extends Controller
             'id' => $user->id,
             'name' => $user->name,
             'unique_name' => $user->unique_name,
-            'email' => $user->email,
             'mobile' => $user->mobile,
-            'age' => $user->age,
-            'gender' => $user->gender,
-            'state' => $user->state,
-            'city' => $user->city,
-            'profession' => $user->profession,
             'refer_code' => $user->refer_code,
             'referred_by' => $user->referred_by,
             'profile' => $imageUrl,
@@ -93,119 +86,39 @@ class AuthController extends Controller
     ], 200);
 }
 
-public function check_email(Request $request)
-{
-    // Retrieve phone number from the request
-    $email = $request->input('email');
-
-    if (empty($email)) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Email is empty.',
-        ], 400);
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Invalid email format.',
-        ], 400);
-    }
-
-    // Check if a customer with the given phone number exists in the database
-    $user = Users::where('email', $email)->with('profession')->first();
-
-    // If customer not found, return failure response
-    if (!$user) {
-        $response['success'] = true;
-        $response['registered'] = false;
-        $response['message'] = 'Email not registered.';
-        return response()->json($response, 404);
-    }
-// Image URL
-$imageUrl = asset('storage/app/public/users/' . $user->profile);
-$coverimageUrl = asset('storage/app/public/users/' . $user->cover_img);
-
-return response()->json([
-    'success' => true,
-    'registered' => true,
-    'message' => 'Logged in successfully.',
-    'data' => [ 
-        'id' => $user->id,
-        'name' => $user->name,
-        'unique_name' => $user->unique_name,
-        'email' => $user->email,
-        'mobile' => $user->mobile,
-        'age' => $user->age,
-        'gender' => $user->gender,
-        'state' => $user->state,
-        'city' => $user->city,
-        'profession' => $user->profession ? $user->profession->profession : null,
-        'refer_code' => $user->refer_code,
-        'referred_by' => $user->referred_by,
-        'profile' => $imageUrl,
-        'cover_img' => $coverimageUrl,
-        'points' => $user->points,
-        'verified' => $user->verified,
-        'online_status' => $user->online_status,
-        'introduction' => $user->introduction,
-        'message_notify' => $user->message_notify,
-        'add_friend_notify' => $user->add_friend_notify,
-        'view_notify' => $user->view_notify,
-        'profile_verified' => $user->profile_verified,
-        'cover_img_verified' => $user->cover_img_verified,
-        'last_seen' => Carbon::parse($user->last_seen)->format('Y-m-d H:i:s'),
-        'datetime' => Carbon::parse($user->datetime)->format('Y-m-d H:i:s'),
-        'updated_at' => Carbon::parse($user->updated_at)->format('Y-m-d H:i:s'),
-        'created_at' => Carbon::parse($user->created_at)->format('Y-m-d H:i:s'),
-    ],
-], 200);
-}
-
 public function register(Request $request)
 {
-    $age = $request->input('age');
     $name = $request->input('name');
+    $mobile = $request->input('mobile');
     $unique_name = $request->input('unique_name');
-    $email = $request->input('email');
-    $gender = $request->input('gender');
-    $state = $request->input('state');
-    $city = $request->input('city');
-    $profession_id = $request->input('profession_id');
     $referred_by = $request->input('referred_by');
     $introduction = $request->input('introduction');
     $points = $request->input('points', 50);
     $total_points = $request->input('total_points', 50);
-    $mobile = $request->input('mobile', '0000000000');
+  
 
-    if (empty($state)) {
-        return response()->json([
-            'success' => false,
-            'message' => 'state is empty.',
-        ], 400);
-    }
-    if (empty($city)) {
-        return response()->json([
-            'success' => false,
-            'message' => 'city is empty.',
-        ], 400);
-    }
     if (empty($introduction)) {
         return response()->json([
             'success' => false,
             'message' => 'introduction is empty.',
         ], 400);
     }
-    if (empty($age)) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Age is empty.',
-        ], 400);
-    } elseif ($age < 18 || $age > 60) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Age should be between 18 and 60.',
-        ], 400);
+    if (empty($mobile)) {
+        $response['success'] = false;
+        $response['message'] = 'mobile is empty.';
+        return response()->json($response, 400);
     }
 
+    // Remove non-numeric characters from the phone number
+    $mobile = preg_replace('/[^0-9]/', '', $mobile);
+
+    // Check if the length of the phone number is not equal to 10
+    if (strlen($mobile) !== 10) {
+        $response['success'] = false;
+        $response['message'] = "mobile number should be exactly 10 digits";
+        return response()->json($response, 400);
+    }
+ 
     if (empty($name)) {
         return response()->json([
             'success' => false,
@@ -218,31 +131,7 @@ public function register(Request $request)
         ], 400);
     }
 
-    if (empty($gender)) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Gender is empty.',
-        ], 400);
-    } 
-    if (empty($profession_id)) {
-        return response()->json([
-            'success' => false,
-            'message' => 'profession_id is empty.',
-        ], 400);
-    }
-
-    if (empty($email)) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Email is empty.',
-        ], 400);
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Invalid email format.',
-        ], 400);
-    }
-
+   
     $existingUser = Users::where('unique_name', $unique_name)->first();
     if ($existingUser) {
         return response()->json([
@@ -250,20 +139,13 @@ public function register(Request $request)
             'message' => 'User already exists with this Unique Name.',
         ], 409);
     }
-    $profession = Professions::find($profession_id);
 
-    if (!$profession) {
-        return response()->json([
-            'success' => false,
-            'message' => 'profession not found.',
-        ], 404);
-    }
     // Check if the user with the given email already exists
-    $existingEmail = Users::where('email', $email)->first();
-    if ($existingEmail) {
+    $existingMobile = Users::where('mobile', $mobile)->first();
+    if ($existingMobile) {
         return response()->json([
             'success' => false,
-            'message' => 'User already exists with this email.',
+            'message' => 'User already exists with this Mobile.',
         ], 409);
     }
     // Generate a refer_code automatically
@@ -281,17 +163,11 @@ public function register(Request $request)
     }
 
     $user = new Users();
-    $user->age = $age;
     $user->name = $name;
-    $user->gender = $gender;
-    $user->profession_id = $profession_id;
     $user->refer_code = $this->generateReferCode();
-    $user->email = $email;
     $user->points = $points;
     $user->total_points = $total_points;
     $user->mobile = $mobile;
-    $user->state = $state;
-    $user->city = $city;
     $user->referred_by = $referred_by;
     $user->introduction = $introduction;
     $user->datetime = now(); 
@@ -307,7 +183,6 @@ public function register(Request $request)
     $user->unique_name = $unique_name;
     $user->save();
 
-    $user->load('profession');
 
     // Image URL
     $imageUrl = asset('storage/app/public/users/' . $user->profile);
@@ -320,13 +195,7 @@ public function register(Request $request)
             'id' => $user->id,
             'name' => $user->name,
             'unique_name' => $user->unique_name,
-            'email' => $user->email,
             'mobile' => $user->mobile,
-            'age' => $user->age,
-            'gender' => $user->gender,
-            'state' => $user->state,
-            'city' => $user->city,
-            'profession' => $user->profession ? $user->profession->profession : null,
             'refer_code' => $refer_code, // Return the generated refer_code
             'referred_by' => $user->referred_by,
             'profile' => $imageUrl,
@@ -415,7 +284,6 @@ public function userdetails(Request $request)
 
     $user->online_status = $online_status;
     $user->save();
-    $user->load('profession');
     // Image URLs
     $imageUrl = asset('storage/app/public/users/' . $user->profile);
     $coverimageUrl = asset('storage/app/public/users/' . $user->cover_img);
@@ -427,13 +295,7 @@ public function userdetails(Request $request)
             'id' => $user->id,
             'name' => $user->name,
             'unique_name' => $user->unique_name,
-            'email' => $user->email,
             'mobile' => $user->mobile,
-            'age' => $user->age,
-            'gender' => $user->gender,
-            'state' => $user->state,
-            'city' => $user->city,
-            'profession' => $user->profession ? $user->profession->profession : null,
             'refer_code' => $user->refer_code,
             'referred_by' => $user->referred_by,
             'profile' => $imageUrl,
@@ -477,7 +339,7 @@ public function other_userdetails(Request $request)
         ], 404);
     }
 
-    $user->load('profession');
+  
     // Image URLs
 
     $imageUrl = $user->profile_verified == 1 ? asset('storage/app/public/users/' . $user->profile) : '';
@@ -491,13 +353,7 @@ public function other_userdetails(Request $request)
             'id' => $user->id,
             'name' => $user->name,
             'unique_name' => $user->unique_name,
-            'email' => $user->email,
             'mobile' => $user->mobile,
-            'age' => $user->age,
-            'gender' => $user->gender,
-            'state' => $user->state,
-            'city' => $user->city,
-            'profession' => $user->profession ? $user->profession->profession : null,
             'refer_code' => $user->refer_code,
             'referred_by' => $user->referred_by,
             'profile' => $imageUrl,
@@ -548,7 +404,6 @@ public function update_image(Request $request)
         $user->save();
         // Image URL
 
-        $user->load('profession');
         $imageUrl = asset('storage/app/public/users/' . $user->profile);
         $coverimageUrl = asset('storage/app/public/users/' . $user->cover_img);
       
@@ -560,13 +415,7 @@ public function update_image(Request $request)
                 'id' => $user->id,
                 'name' => $user->name,
                 'unique_name' => $user->unique_name,
-                'email' => $user->email,
                 'mobile' => $user->mobile,
-                'age' => $user->age,
-                'gender' => $user->gender,
-                'state' => $user->state,
-                'city' => $user->city,
-                'profession' => $user->profession ? $user->profession->profession : null,
                 'refer_code' => $user->refer_code,
                 'referred_by' => $user->referred_by,
                 'profile' => $imageUrl,
@@ -623,7 +472,6 @@ public function update_cover_img(Request $request)
         $user->datetime = now(); 
         $user->save();
         // Image URL
-        $user->load('profession');
         $imageUrl = asset('storage/app/public/users/' . $user->profile);
         $coverimageUrl = asset('storage/app/public/users/' . $user->cover_img);
       
@@ -635,13 +483,7 @@ public function update_cover_img(Request $request)
                 'id' => $user->id,
                 'name' => $user->name,
                 'unique_name' => $user->unique_name,
-                'email' => $user->email,
                 'mobile' => $user->mobile,
-                'age' => $user->age,
-                'gender' => $user->gender,
-                'state' => $user->state,
-                'city' => $user->city,
-               'profession' => $user->profession ? $user->profession->profession : null,
                 'refer_code' => $user->refer_code,
                 'referred_by' => $user->referred_by,
                 'profile' => $imageUrl,
@@ -691,23 +533,9 @@ public function update_users(Request $request)
     }
 
     $name = $request->input('name');
-    $email = $request->input('email');
     $unique_name = $request->input('unique_name');
-    $age = $request->input('age');
-    $profession_id = $request->input('profession_id');
-    $state = $request->input('state');
-    $city = $request->input('city');
     $introduction = $request->input('introduction');
 
-    // Validate age
-    if ($age !== null) {
-        if ($age < 18 || $age > 60) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Age should be between 18 and 60.',
-            ], 400);
-        }
-    }
 
     // Validate name
     if ($name !== null) {
@@ -719,45 +547,12 @@ public function update_users(Request $request)
         }
     }
 
-    // Validate email
-    if ($email !== null) {
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid email format.',
-            ], 400);
-        }
-    }
 
-    // Validate profession_id
-    if ($profession_id !== null) {
-        $profession = Professions::find($profession_id);
-        if (!$profession) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid profession_id.',
-            ], 400);
-        }
-    }
+
 
     // Update user details
     if ($name !== null) {
         $user->name = $name;
-    }
-    if ($email !== null) {
-        $user->email = $email;
-    }
-    if ($age !== null) {
-        $user->age = $age;
-    }
-    if ($profession_id !== null) {
-        $user->profession_id = $profession_id;
-    }
-    if ($state !== null) {
-        $user->state = $state;
-    }
-    if ($city !== null) {
-        $user->city = $city;
     }
     if ($unique_name !== null) {
         $user->unique_name = $unique_name;
@@ -769,7 +564,6 @@ public function update_users(Request $request)
     $user->datetime = now(); 
     $user->save();
 
-    $user->load('profession');
 
     // Image URL
     $imageUrl = asset('storage/app/public/users/' . $user->profile);
@@ -782,13 +576,7 @@ public function update_users(Request $request)
             'id' => $user->id,
             'name' => $user->name,
             'unique_name' => $user->unique_name,
-            'email' => $user->email,
             'mobile' => $user->mobile,
-            'age' => $user->age,
-            'gender' => $user->gender,
-            'state' => $user->state,
-            'city' => $user->city,
-            'profession' => $user->profession ? $user->profession->profession : null,
             'refer_code' => $user->refer_code,
             'referred_by' => $user->referred_by,
             'profile' => $imageUrl,
@@ -2898,34 +2686,7 @@ public function add_feedback(Request $request)
         'message' => 'Feedback added successfully.',
     ], 201);
 }
-
-public function profession_list(Request $request)
-{
-    // Retrieve all professions
-    $professions = Professions::all();
-
-    if ($professions->isEmpty()) {
-        return response()->json([
-            'success' => false,
-            'message' => 'No profession found.',
-        ], 404);
-    }
-
-    $professionData = [];
-    foreach ($professions as $profession) {
-        $professionData[] = [
-            'id' => $profession->id,
-            'profession' => $profession->profession,
-        ];
-    }
-
-    return response()->json([
-        'success' => true,
-        'message' => 'Professions listed successfully.',
-        'data' => $professionData,
-    ], 200);
-}
-
+   
 public function settings_list(Request $request)
 {
     // Retrieve all news settings
