@@ -3,12 +3,11 @@
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\PointsController;
 use App\Http\Controllers\UsersController;
-use App\Http\Controllers\TripsController;
+use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\ChatsController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\HomeController;    
 use App\Http\Controllers\OrderController;
-use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\Auth\LoginController;
@@ -63,15 +62,15 @@ Route::prefix('admin')->middleware('auth')->group(function () {
 
 
    
-     //Trips  
-     Route::get('/trips', [TripsController::class, 'index'])->name('trips.index');
-     Route::get('/trips/create', [TripsController::class, 'create'])->name('trips.create');
-     Route::get('/trips/{trips}/edit', [TripsController::class, 'edit'])->name('trips.edit');
-     Route::delete('/trips/{trips}', [TripsController::class, 'destroy'])->name('trips.destroy');
-     Route::put('/trips/{trips}', [TripsController::class, 'update'])->name('trips.update');
-     Route::post('/trips', [TripsController::class, 'store'])->name('trips.store');
-     Route::post('/trips/updateStatus', [TripsController::class, 'updateStatus'])->name('trips.updateStatus');
-     Route::post('/trips/sendNotification', [TripsController::class, 'sendNotification'])->name('trips.sendNotification');
+     //products  
+     Route::get('/products', [ProductsController::class, 'index'])->name('products.index');
+     Route::get('/products/create', [ProductsController::class, 'create'])->name('products.create');
+     Route::get('/products/{products}/edit', [ProductsController::class, 'edit'])->name('products.edit');
+     Route::delete('/products/{products}', [ProductsController::class, 'destroy'])->name('products.destroy');
+     Route::put('/products/{products}', [ProductsController::class, 'update'])->name('products.update');
+     Route::post('/products', [ProductsController::class, 'store'])->name('products.store');
+     Route::post('/products/updateStatus', [ProductsController::class, 'updateStatus'])->name('products.updateStatus');
+     Route::post('/products/sendNotification', [ProductsController::class, 'sendNotification'])->name('products.sendNotification');
 
 
      //Chats  

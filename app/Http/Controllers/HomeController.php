@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Points;
 use App\Models\Users;
-use App\Models\Trips;
+use App\Models\Products;
 use App\Models\Verifications;
 use Illuminate\Http\Request;
 
@@ -29,9 +29,9 @@ class HomeController extends Controller
      public function index()
      {
          $users_count = Users::count();
-         $trips_count = Trips::count();
+         $products_count = Products::count();
          $points_count = Points::count();
-         $pending_trips_count = Trips::where('trip_status', 0)->count();
+         $pending_products_count = Products::where('product_status', 0)->count();
          $pending_profile_count = Users::where('profile_verified', 0)->count();
          $pending_cover_image_count = Users::where('cover_img_verified', 0)->count();
          $pending_verification = Verifications::where('status', 0)->count();
@@ -42,9 +42,9 @@ class HomeController extends Controller
      
          return view('home', [
              'users_count' => $users_count,
-             'trips_count' => $trips_count,
+             'products_count' => $products_count,
              'points_count' => $points_count,
-             'pending_trips_count' => $pending_trips_count,
+             'pending_products_count' => $pending_products_count,
              'pending_profile_count' => $pending_profile_count,
              'pending_cover_image_count' => $pending_cover_image_count,
              'pending_verification' => $pending_verification,

@@ -1,109 +1,225 @@
 @extends('layouts.admin')
 
-@section('title', 'Create Product')
-@section('content-header', 'Create Product')
-
+@section('title', 'Create products')
+@section('content-header', 'Create products')
+@section('content-actions')
+    <a href="{{route('products.index')}}" class="btn btn-success"><i class="fas fa-back"></i>Back To product</a>
+@endsection
 @section('content')
 
-<div class="card">
-    <div class="card-body">
-	<!-- Log on to codeastro.com for more projects -->
-        <form action="{{ route('products.store') }}" method="POST" enctype="multipart/form-data">
-            @csrf
+    <div class="card">
+        <div class="card-body">
 
-            <div class="form-group">
-                <label for="name">Name</label>
-                <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" id="name"
-                    placeholder="Enter product name" value="{{ old('name') }}">
-                @error('name')
-                <span class="invalid-feedback" role="alert">
-                    <strong>{{ $message }}</strong>
-                </span>
-                @enderror
-            </div>
+            <form action="{{ route('products.store') }}" method="POST" enctype="multipart/form-data">
+                @csrf
 
-
-            <div class="form-group">
-                <label for="description">Description</label>
-                <textarea name="description" class="form-control @error('description') is-invalid @enderror"
-                    id="description" placeholder="Enter short description">{{ old('description') }}</textarea>
-                @error('description')
-                <span class="invalid-feedback" role="alert">
-                    <strong>{{ $message }}</strong>
-                </span>
-                @enderror
-            </div>
-
-            <div class="form-group">
-                <label for="image">Product Image</label>
-                <div class="custom-file">
-                    <input type="file" class="custom-file-input" name="image" id="image">
-                    <label class="custom-file-label" for="image">Choose File</label>
+                <div class="form-group">
+                    <label for="user_id">User ID</label>
+                    <input type="text" name="user_id" class="form-control @error('user_id') is-invalid @enderror"
+                           id="user_id"
+                           placeholder="User ID" value="{{ old('user_id') }}">
+                    @error('user_id')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ $message }}</strong>
+                    </span>
+                    @enderror
                 </div>
-                @error('image')
-                <span class="invalid-feedback" role="alert">
-                    <strong>{{ $message }}</strong>
-                </span>
-                @enderror
-            </div>
 
-            <div class="form-group">
-                <label for="barcode">Barcode</label>
-                <input type="text" name="barcode" class="form-control @error('barcode') is-invalid @enderror"
-                    id="barcode" placeholder="Enter barcode number" value="{{ old('barcode') }}">
-                @error('barcode')
-                <span class="invalid-feedback" role="alert">
-                    <strong>{{ $message }}</strong>
-                </span>
-                @enderror
-            </div>
+                <button type="button" class="btn btn-primary" onclick="toggleUserListModal()">Select User</button>
 
-            <div class="form-group">
-                <label for="price">Price</label>
-                <input type="number" name="price" class="form-control @error('price') is-invalid @enderror" id="price"
-                    placeholder="Enter price" value="{{ old('price') }}">
-                @error('price')
-                <span class="invalid-feedback" role="alert">
-                    <strong>{{ $message }}</strong>
-                </span>
-                @enderror
-            </div>
+                <div class="form-group">
+                <br>
+                    <label for="product_type">product Type</label>
+                    <select name="product_type" class="form-control @error('product_type') is-invalid @enderror" id="product_type">
+                        <option value=''>--select--</option>
+                        <option value='Road product' {{ old('product_type') == 'Road product' ? 'selected' : '' }}>Road product</option>
+                        <option value='Adventure product' {{ old('product_type') == 'Adventure product' ? 'selected' : '' }}>Adventure product</option>
+                        <option value='Explore Cities' {{ old('product_type') == 'Explore Cities' ? 'selected' : '' }}>Explore Cities</option>
+                        <option value='Airport Flyover' {{ old('product_type') == 'Airport Flyover' ? 'selected' : '' }}>Airport Flyover</option>
+                    </select>
+                    @error('profession')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ $message }}</strong>
+                    </span>
+                    @enderror
+                </div>
+                
+                <div class="form-group">
+                    <label for="product_title">product Title</label>
+                    <input type="text" name="product_title" class="form-control @error('product_title') is-invalid @enderror" id="product_title"
+                           placeholder="product Title" value="{{ old('product_title') }}">
+                    @error('product_title')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ $message }}</strong>
+                    </span>
+                    @enderror
+                 </div>
 
-            <div class="form-group">
-                <label for="quantity">Quantity</label>
-                <input type="text" name="quantity" class="form-control @error('quantity') is-invalid @enderror"
-                    id="quantity" placeholder="Quantity" value="{{ old('quantity', 1) }}">
-                @error('quantity')
-                <span class="invalid-feedback" role="alert">
-                    <strong>{{ $message }}</strong>
-                </span>
-                @enderror
-            </div>
+                 <div class="form-group">
+    <label for="product_description">product Description</label>
+    <textarea name="product_description" class="form-control @error('product_description') is-invalid @enderror" 
+              id="product_description" rows="3" placeholder="product Description">{{ old('product_description') }}</textarea>
+    @error('product_description')
+    <span class="invalid-feedback" role="alert">
+        <strong>{{ $message }}</strong>
+    </span>
+    @enderror
+</div>
 
-            <div class="form-group">
-                <label for="status">Status</label>
-                <select name="status" class="form-control @error('status') is-invalid @enderror" id="status">
-                    <option value="1" {{ old('status') === 1 ? 'selected' : ''}}>Active</option>
-                    <option value="0" {{ old('status') === 0 ? 'selected' : ''}}>Inactive</option>
-                </select>
-                @error('status')
-                <span class="invalid-feedback" role="alert">
-                    <strong>{{ $message }}</strong>
-                </span>
-                @enderror
-            </div>
+<div class="form-group">
+                    <label for="product_image">product Image</label>
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" name="product_image" id="product_image" onchange="updateProfileLabel(this)">
+                        <label class="custom-file-label" for="product_image" id="product_image-label">Choose File</label>
+                    </div>
+                    @error('product_image')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ $message }}</strong>
+                    </span>
+                    @enderror
+                </div>
 
-            <button class="btn btn-success btn-block btn-lg" type="submit">Submit</button>
-        </form><!-- Log on to codeastro.com for more projects -->
+                <button class="btn btn-success btn-block btn-lg" type="submit">Submit</button>
+            </form>
+        </div>
+    </div>
+    <div id="userListModal" class="modal">
+    <!-- Modal content -->
+    <div class="modal-content">
+    <span class="close" onclick="toggleUserListModal()">&times;</span>
+    <h2>User List</h2>
+    <!-- Search input -->
+    <input type="text" id="searchInput" oninput="searchUsers()" placeholder="Search...">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="userTable">
+                    <thead>
+                        <tr>
+                        <th>Select</th>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Mobile</th>
+                            <th>Email</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($users as $user)
+                        <tr>
+                             <td>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="selected_user_id" value="{{ $user->id }}" onclick="selectUser(this)">
+                                </div>
+                            </td>
+                            <td>{{ $user->id }}</td>
+                            <td>{{ $user->name }}</td>
+                            <td>{{ $user->mobile }}</td>
+                            <td>{{ $user->email }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                 
+                </table>
+            </div>
+           <!-- Pagination -->
+<nav aria-label="User List Pagination">
+    <ul class="pagination justify-content-center">
+        <!-- Previous button -->
+        <li class="page-item">
+            <button class="page-link" onclick="prevPage()" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+                <span class="sr-only">Previous</span>
+            </button>
+        </li>
+        
+        <!-- Next button -->
+        <li class="page-item">
+            <button class="page-link" onclick="nextPage()" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+                <span class="sr-only">Next</span>
+            </button>
+        </li>
+    </ul>
+</nav>
+
+        </div>
     </div>
 </div>
-@endsection
 
+@endsection
 @section('js')
-<script src="{{ asset('plugins/bs-custom-file-input/bs-custom-file-input.min.js') }}"></script>
-<script>
-    $(document).ready(function () {
-        bsCustomFileInput.init();
-    });
-</script>
+    <!-- Include any additional JavaScript if needed -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Define variables for pagination
+        var currentPage = 1;
+        var itemsPerPage = 10; // Change this value as needed
+        var userListRows = $('#userTable tbody tr');
+
+        // Function to toggle the user list modal
+        function toggleUserListModal() {
+            $('.modal').toggle(); // Toggle the modal
+        }
+
+        // Function to filter user list based on search input
+        function searchUsers() {
+            var searchText = $('#searchInput').val().toLowerCase();
+            $('#userTable tbody tr').each(function() {
+                var id = $(this).find('td:eq(1)').text().toLowerCase();
+                var name = $(this).find('td:eq(2)').text().toLowerCase();
+                var mobile = $(this).find('td:eq(3)').text().toLowerCase();
+                var email = $(this).find('td:eq(4)').text().toLowerCase();
+                if (id.includes(searchText) || name.includes(searchText) || mobile.includes(searchText) || email.includes(searchText)) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        }
+
+        // Function to handle checkbox click and update user_id input
+        function selectUser(checkbox) {
+    // Deselect all checkboxes
+    $('input[name="selected_user_id"]').prop('checked', false);
+    // Select only the clicked checkbox
+    $(checkbox).prop('checked', true);
+    // Set its value to the user_id input field
+    $('#user_id').val(checkbox.value);
+        }
+
+        // Function to show the specified page of users
+        function showPage(page) {
+            var startIndex = (page - 1) * itemsPerPage;
+            var endIndex = startIndex + itemsPerPage;
+            userListRows.hide().slice(startIndex, endIndex).show();
+        }
+
+        // Function to go to the previous page
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                showPage(currentPage);
+            }
+        }
+
+        // Function to go to the next page
+        function nextPage() {
+            if (currentPage < Math.ceil(userListRows.length / itemsPerPage)) {
+                currentPage++;
+                showPage(currentPage);
+            }
+        }
+
+        // Show the first page initially
+        showPage(currentPage);
+    </script>
+       <script>
+        $(document).ready(function () {
+            bsCustomFileInput.init();
+        });
+
+        function updateProfileLabel(input) {
+            var fileName = input.files[0].name;
+            var label = $(input).siblings('.custom-file-label');
+            label.text(fileName);
+        }
+    </script>
 @endsection

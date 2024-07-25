@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Users; 
 use App\Models\Chats; 
-use App\Models\Trips;
+use App\Models\Products;
 use App\Models\Friends; 
 use App\Models\Points; 
 use App\Models\Notifications; 
@@ -741,33 +741,33 @@ public function update_notify(Request $request)
     ], 200);
 }
 
-public function add_trip(Request $request)
+public function add_product(Request $request)
 {
     $user_id = $request->input('user_id'); 
-    $trip_type = $request->input('trip_type');
-    $trip_title = $request->input('trip_title');
-    $trip_description = $request->input('trip_description');
+    $product_type = $request->input('product_type');
+    $product_title = $request->input('product_title');
+    $product_description = $request->input('product_description');
 
     $errors = [];
 
        // Validate each input and return specific error messages
-       if (empty($trip_type)) {
+       if (empty($product_type)) {
         return response()->json([
             'success' => false,
-            'message' => 'Trip Type is empty.',
+            'message' => 'product Type is empty.',
         ], 400);
     }
             
-    if (empty($trip_title)) {
+    if (empty($product_title)) {
         return response()->json([
             'success' => false,
-            'message' => 'Trip Title is empty.',
+            'message' => 'product Title is empty.',
         ], 400);
     }
-    if (empty($trip_description)) {
+    if (empty($product_description)) {
         return response()->json([
             'success' => false,
-            'message' => 'Trip Description is empty.',
+            'message' => 'product Description is empty.',
         ], 400);
     }
 
@@ -795,24 +795,24 @@ public function add_trip(Request $request)
     }
 
 
-   // Create a new trip instance
-   $trip = new trips();
-   $trip->user_id = $user_id;
-   $trip->trip_type = $trip_type;
-   $trip->trip_title = $trip_title;
-   $trip->trip_description = $trip_description;
-   $trip->trip_datetime = now();
-   $trip->save();
+   // Create a new product instance
+   $product = new Products();
+   $product->user_id = $user_id;
+   $product->product_type = $product_type;
+   $product->product_title = $product_title;
+   $product->product_description = $product_description;
+   $product->product_datetime = now();
+   $product->save();
 
         // Image URL
-        $imageUrl = asset('storage/app/public/trips/' . $trip->trip_image);
-  // Fetch user details associated with the trip
-  $user = Users::find($trip->user_id);
+        $imageUrl = asset('storage/app/public/products/' . $product->product_image);
+  // Fetch user details associated with the product
+  $user = Users::find($product->user_id);
 
    // Calculate time difference in hours
- $tripTime = Carbon::parse($trip->trip_datetime);
+ $productTime = Carbon::parse($product->product_datetime);
  $currentTime = Carbon::now();
- $hoursDifference = $tripTime->diffInHours($currentTime);
+ $hoursDifference = $productTime->diffInHours($currentTime);
  
  // Determine the time display string
  if ($hoursDifference == 0) {
@@ -827,97 +827,97 @@ public function add_trip(Request $request)
 
     return response()->json([
         'success' => true,
-        'message' => 'Trip Added successfully.',
+        'message' => 'product Added successfully.',
         'data' => [
-            'id' => $trip->id,
+            'id' => $product->id,
             'name' => $user->name,
             'unique_name' => $user->unique_name,
             'verified' => $user->verified,
-            'trip_type' => $trip->trip_type,
+            'product_type' => $product->product_type,
             'time' => $timeDifference, 
-            'trip_title' => $trip->trip_title,
-            'trip_description' => $trip->trip_description,
-            'trip_status' => 0,
-            'trip_image' => $imageUrl,
-            'trip_datetime' => Carbon::parse($trip->trip_datetime)->format('Y-m-d H:i:s'),
-            'updated_at' => Carbon::parse($trip->updated_at)->format('Y-m-d H:i:s'),
-            'created_at' => Carbon::parse($trip->created_at)->format('Y-m-d H:i:s'),
+            'product_title' => $product->product_title,
+            'product_description' => $product->product_description,
+            'product_status' => 0,
+            'product_image' => $imageUrl,
+            'product_datetime' => Carbon::parse($product->product_datetime)->format('Y-m-d H:i:s'),
+            'updated_at' => Carbon::parse($product->updated_at)->format('Y-m-d H:i:s'),
+            'created_at' => Carbon::parse($product->created_at)->format('Y-m-d H:i:s'),
         ],
     ], 201);
 }
 
-public function update_trip_image(Request $request)
+public function update_product_image(Request $request)
 {
-    $tripId = $request->input('trip_id');
+    $productId = $request->input('product_id');
 
-    if (empty($tripId)) {
+    if (empty($productId)) {
         return response()->json([
             'success' => false,
-            'message' => 'trip_id is empty.',
+            'message' => 'product_id is empty.',
         ], 400);
     }
 
-    $trip = Trips::find($tripId);
+    $product = Products::find($productId);
 
-    if (!$trip) {
+    if (!$product) {
         return response()->json([
             'success' => false,
-            'message' => 'Trip not found.',
+            'message' => 'product not found.',
         ], 404);
     }
 
-    $tripImage = $request->file('trip_image');
+    $productImage = $request->file('product_image');
 
-    if ($tripImage) {
-        $imagePath = $tripImage->store('trips', 'public');
-        $trip->trip_image = basename($imagePath);
-        $trip->trip_datetime = now(); 
-        $trip->save();
+    if ($productImage) {
+        $imagePath = $productImage->store('products', 'public');
+        $product->product_image = basename($imagePath);
+        $product->product_datetime = now(); 
+        $product->save();
 
         return response()->json([
             'success' => true,
-            'message' => 'Trip image updated successfully.',
+            'message' => 'product image updated successfully.',
         ], 200);
     } 
     else {
         return response()->json([
             'success' => false,
-            'message' => 'Trip image is empty.',
+            'message' => 'product image is empty.',
         ], 400);
     }
 }
 
-public function update_trip(Request $request)
+public function update_product(Request $request)
 {
-    $trip_id = $request->input('trip_id');
+    $product_id = $request->input('product_id');
 
-    if (empty($trip_id)) {
+    if (empty($product_id)) {
         return response()->json([
             'success' => false,
-            'message' => 'trip_id is empty.',
+            'message' => 'product_id is empty.',
         ], 400);
     }
 
-    // Retrieve the trip
-    $trip = Trips::find($trip_id);
+    // Retrieve the product
+    $product = Products::find($product_id);
 
-    if (!$trip) {
+    if (!$product) {
         return response()->json([
             'success' => false,
-            'message' => 'Trip not found.',
+            'message' => 'product not found.',
         ], 404);
     }
 
     $user_id = $request->input('user_id'); 
-    $trip_type = $request->input('trip_type');
+    $product_type = $request->input('product_type');
     $from_date = $request->input('from_date');
     $to_date = $request->input('to_date');
-    $trip_title = $request->input('trip_title');
-    $trip_description = $request->input('trip_description');
+    $product_title = $request->input('product_title');
+    $product_description = $request->input('product_description');
     $location = $request->input('location');
-    $trip_image = $request->file('trip_image');
+    $product_image = $request->file('product_image');
 
-    // Update trip details if provided
+    // Update product details if provided
     if ($user_id !== null) {
         // Check if user_id is valid
         $user = Users::find($user_id);
@@ -927,16 +927,16 @@ public function update_trip(Request $request)
                 'message' => 'User not found.',
             ], 404);
         }
-        $trip->user_id = $user_id;
+        $product->user_id = $user_id;
     }
-    if ($trip_type !== null) {
-        if (empty($trip_type)) {
+    if ($product_type !== null) {
+        if (empty($product_type)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Trip Type is empty.',
+                'message' => 'product Type is empty.',
             ], 400);
         }
-        $trip->trip_type = $trip_type;
+        $product->product_type = $product_type;
     }
     if ($from_date !== null) {
         if (empty($from_date)) {
@@ -945,7 +945,7 @@ public function update_trip(Request $request)
                 'message' => 'From Date is empty.',
             ], 400);
         }
-        $trip->from_date = Carbon::parse($from_date)->format('Y-m-d');
+        $product->from_date = Carbon::parse($from_date)->format('Y-m-d');
     }
     if ($to_date !== null) {
         if (empty($to_date)) {
@@ -954,25 +954,25 @@ public function update_trip(Request $request)
                 'message' => 'To Date is empty.',
             ], 400);
         }
-        $trip->to_date = Carbon::parse($to_date)->format('Y-m-d');
+        $product->to_date = Carbon::parse($to_date)->format('Y-m-d');
     }
-    if ($trip_title !== null) {
-        if (empty($trip_title)) {
+    if ($product_title !== null) {
+        if (empty($product_title)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Trip Title is empty.',
+                'message' => 'product Title is empty.',
             ], 400);
         }
-        $trip->trip_title = $trip_title;
+        $product->product_title = $product_title;
     }
-    if ($trip_description !== null) {
-        if (empty($trip_description)) {
+    if ($product_description !== null) {
+        if (empty($product_description)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Trip Description is empty.',
+                'message' => 'product Description is empty.',
             ], 400);
         }
-        $trip->trip_description = $trip_description;
+        $product->product_description = $product_description;
     }
  
     if ($location !== null) {
@@ -982,28 +982,28 @@ public function update_trip(Request $request)
                 'message' => 'Location is empty.',
             ], 400);
         }
-        $trip->location = $location;
+        $product->location = $location;
     }
-    if ($trip_image !== null) {
-        $imagePath = $trip_image->store('trips', 'public');
-        $trip->trip_image = basename($imagePath);
+    if ($product_image !== null) {
+        $imagePath = $product_image->store('products', 'public');
+        $product->product_image = basename($imagePath);
     }
 
-    $trip->trip_datetime = now(); 
+    $product->product_datetime = now(); 
 
-    // Save the updated trip
-    $trip->save();
+    // Save the updated product
+    $product->save();
 
-        // Fetch user details associated with the trip
-        $user = Users::find($trip->user_id);
+        // Fetch user details associated with the product
+        $user = Users::find($product->user_id);
 
             // Image URL
-            $imageUrl = asset('storage/app/public/trips/' . $trip->trip_image);
+            $imageUrl = asset('storage/app/public/products/' . $product->product_image);
 
             // Calculate time difference in hours
- $tripTime = Carbon::parse($trip->trip_datetime);
+ $productTime = Carbon::parse($product->product_datetime);
  $currentTime = Carbon::now();
- $hoursDifference = $tripTime->diffInHours($currentTime);
+ $hoursDifference = $productTime->diffInHours($currentTime);
  
  // Determine the time display string
  if ($hoursDifference == 0) {
@@ -1018,29 +1018,29 @@ public function update_trip(Request $request)
 
     return response()->json([
         'success' => true,
-        'message' => 'Trip updated successfully.',
+        'message' => 'product updated successfully.',
         'data' => [
-            'id' => $trip->id,
+            'id' => $product->id,
             'name' => $user->name,
             'unique_name' => $user->unique_name,
             'verified' => $user->verified,
-            'trip_type' => $trip->trip_type,
-            'from_date' => date('F j, Y', strtotime($trip->from_date)),
-            'to_date' => date('F j, Y', strtotime($trip->to_date)),
+            'product_type' => $product->product_type,
+            'from_date' => date('F j, Y', strtotime($product->from_date)),
+            'to_date' => date('F j, Y', strtotime($product->to_date)),
             'time' => $timeDifference, 
-            'trip_title' => $trip->trip_title,
-            'trip_description' => $trip->trip_description,
-            'location' => $trip->location,
-            'trip_status' => $trip->trip_status,
-            'trip_image' => $imageUrl,
-            'trip_datetime' => Carbon::parse($trip->trip_datetime)->format('Y-m-d H:i:s'),
-            'updated_at' => Carbon::parse($trip->updated_at)->format('Y-m-d H:i:s'),
-            'created_at' => Carbon::parse($trip->created_at)->format('Y-m-d H:i:s'),
+            'product_title' => $product->product_title,
+            'product_description' => $product->product_description,
+            'location' => $product->location,
+            'product_status' => $product->product_status,
+            'product_image' => $imageUrl,
+            'product_datetime' => Carbon::parse($product->product_datetime)->format('Y-m-d H:i:s'),
+            'updated_at' => Carbon::parse($product->updated_at)->format('Y-m-d H:i:s'),
+            'created_at' => Carbon::parse($product->created_at)->format('Y-m-d H:i:s'),
         ],
     ], 200);
 }
 
-public function trip_list(Request $request)
+public function product_list(Request $request)
 {
     // Get offset and limit from request with default values
     $offset = $request->has('offset') ? $request->input('offset') : 0; // Default offset is 0 if not provided
@@ -1066,31 +1066,31 @@ public function trip_list(Request $request)
     $offset = (int)$offset;
     $limit = (int)$limit;
 
-    // Count total trips with status 1
-    $totalTrips = Trips::where('trip_status', 1)->count();
+    // Count total Products with status 1
+    $totalProducts = Products::where('product_status', 1)->count();
 
-    // If offset is beyond the total trips, set offset to 0
-    if ($offset >= $totalTrips) {
+    // If offset is beyond the total Products, set offset to 0
+    if ($offset >= $totalProducts) {
         $offset = 0;
     }
 
-    // Fetch trips with status 1 from the database with pagination
-    $trips = Trips::where('trip_status', 1)
+    // Fetch products with status 1 from the database with pagination
+    $products = Products::where('product_status', 1)
         ->skip($offset)
         ->take($limit)
         ->get();
 
-    if ($trips->isEmpty()) {
+    if ($products->isEmpty()) {
         return response()->json([
             'success' => false,
-            'message' => 'No trips found.',
+            'message' => 'No products found.',
         ], 404);
     }
 
-    $tripDetails = [];
+    $productDetails = [];
 
-    foreach ($trips as $trip) {
-        $user = Users::find($trip->user_id);
+    foreach ($products as $product) {
+        $user = Users::find($product->user_id);
         if ($user) {
             $imageUrl = asset('storage/app/public/users/' . $user->profile);
             $coverimageUrl = asset('storage/app/public/users/' . $user->cover_img);
@@ -1100,9 +1100,9 @@ public function trip_list(Request $request)
         }
 
         // Calculate time difference in hours
-        $tripTime = Carbon::parse($trip->trip_datetime);
+        $productTime = Carbon::parse($product->product_datetime);
         $currentTime = Carbon::now();
-        $hoursDifference = $tripTime->diffInHours($currentTime);
+        $hoursDifference = $productTime->diffInHours($currentTime);
 
         // Determine the time display string
         if ($hoursDifference == 0) {
@@ -1114,37 +1114,37 @@ public function trip_list(Request $request)
             $timeDifference = $daysDifference . 'd';
         }
 
-        $tripimageUrl = asset('storage/app/public/trips/' . $trip->trip_image);
+        $productimageUrl = asset('storage/app/public/products/' . $product->product_image);
 
-        $tripDetails[] = [
-            'id' => $trip->id,
-            'user_id' => $trip->user_id,
+        $productDetails[] = [
+            'id' => $product->id,
+            'user_id' => $product->user_id,
             'name' => $user ? $user->name : null,
             'verified' => $user ? $user->verified : null,
             'unique_name' => $user ? $user->unique_name : null,
             'profile' => $imageUrl,
             'cover_image' => $coverimageUrl,
-            'trip_type' => $trip->trip_type,
+            'product_type' => $product->product_type,
             'time' => $timeDifference,
-            'trip_title' => $trip->trip_title,
-            'trip_description' => $trip->trip_description,
-            'trip_status' => $trip->trip_status,
-            'trip_image' => $tripimageUrl,
-            'trip_datetime' => Carbon::parse($trip->trip_datetime)->format('Y-m-d H:i:s'),
-            'updated_at' => Carbon::parse($trip->updated_at)->format('Y-m-d H:i:s'),
-            'created_at' => Carbon::parse($trip->created_at)->format('Y-m-d H:i:s'),
+            'product_title' => $product->product_title,
+            'product_description' => $product->product_description,
+            'product_status' => $product->product_status,
+            'product_image' => $productimageUrl,
+            'product_datetime' => Carbon::parse($product->product_datetime)->format('Y-m-d H:i:s'),
+            'updated_at' => Carbon::parse($product->updated_at)->format('Y-m-d H:i:s'),
+            'created_at' => Carbon::parse($product->created_at)->format('Y-m-d H:i:s'),
         ];
     }
 
     return response()->json([
         'success' => true,
-        'message' => 'Trip details retrieved successfully.',
-        'total' => $totalTrips,
-        'data' => $tripDetails,
+        'message' => 'product details retrieved successfully.',
+        'total' => $totalProducts,
+        'data' => $productDetails,
     ], 200);
 }
 
-public function my_trip_list(Request $request)
+public function my_product_list(Request $request)
 {
     // Get the user_id from the request
     $user_id = $request->input('user_id');
@@ -1180,32 +1180,32 @@ public function my_trip_list(Request $request)
     $offset = (int)$offset;
     $limit = (int)$limit;
 
-    $totalTrips = Trips::where('user_id', $user_id)->count();
+    $totalProducts = Products::where('user_id', $user_id)->count();
 
           // If offset is beyond the total chats, set offset to 0
-          if ($offset >= $totalTrips) {
+          if ($offset >= $totalProducts) {
             $offset = 0;
         } 
 
-    // Fetch trips for the specific user_id from the database with pagination
-    $trips = Trips::where('user_id', $user_id)
+    // Fetch products for the specific user_id from the database with pagination
+    $products = Products::where('user_id', $user_id)
         ->skip($offset)
         ->take($limit)
         ->get();
 
 
 
-    if ($trips->isEmpty()) {
+    if ($products->isEmpty()) {
         return response()->json([
             'success' => false,
-            'message' => 'No trips found.',
+            'message' => 'No products found.',
         ], 404);
     }
 
-    $tripDetails = [];
+    $productDetails = [];
 
-    foreach ($trips as $trip) {
-        $user = Users::find($trip->user_id);
+    foreach ($products as $product) {
+        $user = Users::find($product->user_id);
         if ($user) {
             $imageUrl = asset('storage/app/public/users/' . $user->profile);
             $coverimageUrl = asset('storage/app/public/users/' . $user->cover_img);
@@ -1215,9 +1215,9 @@ public function my_trip_list(Request $request)
         }
 
         // Calculate time difference in hours
-        $tripTime = Carbon::parse($trip->trip_datetime);
+        $productTime = Carbon::parse($product->product_datetime);
         $currentTime = Carbon::now();
-        $hoursDifference = $tripTime->diffInHours($currentTime);
+        $hoursDifference = $productTime->diffInHours($currentTime);
 
         // Determine the time display string
         if ($hoursDifference == 0) {
@@ -1229,64 +1229,64 @@ public function my_trip_list(Request $request)
             $timeDifference = $daysDifference . 'd';
         }
 
-        $tripimageUrl = asset('storage/app/public/trips/' . $trip->trip_image);
+        $productimageUrl = asset('storage/app/public/products/' . $product->product_image);
 
-        $tripDetails[] = [
-            'id' => $trip->id,
-            'user_id' => $trip->user_id,
+        $productDetails[] = [
+            'id' => $product->id,
+            'user_id' => $product->user_id,
             'name' => $user->name,
             'verified' => $user->verified,
             'unique_name' => $user->unique_name,
             'profile' => $imageUrl,
             'cover_image' => $coverimageUrl,
-            'trip_type' => $trip->trip_type,
+            'product_type' => $product->product_type,
             'time' => $timeDifference,
-            'trip_title' => $trip->trip_title,
-            'trip_description' => $trip->trip_description,
-            'trip_status' => $trip->trip_status,
-            'trip_image' => $tripimageUrl,
-            'trip_datetime' => Carbon::parse($trip->trip_datetime)->format('Y-m-d H:i:s'),
-            'updated_at' => Carbon::parse($trip->updated_at)->format('Y-m-d H:i:s'),
-            'created_at' => Carbon::parse($trip->created_at)->format('Y-m-d H:i:s'),
+            'product_title' => $product->product_title,
+            'product_description' => $product->product_description,
+            'product_status' => $product->product_status,
+            'product_image' => $productimageUrl,
+            'product_datetime' => Carbon::parse($product->product_datetime)->format('Y-m-d H:i:s'),
+            'updated_at' => Carbon::parse($product->updated_at)->format('Y-m-d H:i:s'),
+            'created_at' => Carbon::parse($product->created_at)->format('Y-m-d H:i:s'),
         ];
     }
 
     return response()->json([
         'success' => true,
-        'message' => 'Trip details retrieved successfully.',
-        'total' => $totalTrips,
-        'data' => $tripDetails,
+        'message' => 'product details retrieved successfully.',
+        'total' => $totalProducts,
+        'data' => $productDetails,
     ], 200);
 }
 
 
-public function delete_trip(Request $request)
+public function delete_product(Request $request)
 {
-    $trip_id = $request->input('trip_id');
+    $product_id = $request->input('product_id');
 
-    if (empty($trip_id)) {
+    if (empty($product_id)) {
         return response()->json([
             'success' => false,
-            'message' => 'trip_id is empty.',
+            'message' => 'product_id is empty.',
         ], 400);
     }
 
     // Fetch the offer from the database based on the provided offer_id
-    $trip = Trips::find($trip_id);
+    $product = Products::find($product_id);
 
-    if (!$trip) {
+    if (!$product) {
         return response()->json([
             'success' => false,
-            'message' => 'trip not found.',
+            'message' => 'product not found.',
         ], 404);
     }
 
     // Delete the offer
-    $trip->delete();
+    $product->delete();
 
     return response()->json([
         'success' => true,
-        'message' => 'Trip deleted successfully.',
+        'message' => 'product deleted successfully.',
     ], 200);
 }
 

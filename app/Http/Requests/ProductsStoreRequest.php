@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class TripsStoreRequest extends FormRequest
+class ProductsStoreRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,15 +24,15 @@ class TripsStoreRequest extends FormRequest
     public function rules()
     {
         return [
-            'trip_type' => 'nullable|string',
+            'product_type' => 'nullable|string',
             'location' => 'nullable|string',
             'from_date' => 'nullable|date',
             'to_date' => 'nullable|date',
-            'trip_title' => 'nullable|string',
-            'trip_description' => 'nullable|string',
+            'product_title' => 'nullable|string',
+            'product_description' => 'nullable|string',
             'user_id' => 'required|exists:users,id',
             'datetime' => 'nullable|datetime',
-            'avatar' => 'nullable|trip_image',
+            'avatar' => 'nullable|product_image',
         ];
     }
 }
