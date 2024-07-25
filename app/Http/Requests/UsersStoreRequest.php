@@ -39,6 +39,7 @@ class UsersStoreRequest extends FormRequest
             'add_friend_notify' => 'nullable|boolean',
             'view_notify' => 'nullable|boolean',
             'profile_verified' => 'nullable|boolean',
+            'become_an_seller' => 'nullable|boolean',
             'cover_img_verified' => 'nullable|boolean',
             'last_Seen' => 'nullable|datetime',
             'dob' => 'nullable|date',

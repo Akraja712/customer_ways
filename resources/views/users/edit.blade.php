@@ -264,6 +264,20 @@
                         @enderror
                     </div>
 
+                    <div class="form-group">
+                        <label for="become_an_seller">Become An Seller</label>
+                        <div class="custom-control custom-switch">
+                            <input type="hidden" name="become_an_seller" value="0"> <!-- Hidden input to ensure a value is always submitted -->
+                            <input type="checkbox" name="become_an_seller" class="custom-control-input @error('become_an_seller') is-invalid @enderror" id="become_an_seller" value="1" {{ old('become_an_seller', $users->become_an_seller) == '1' ? 'checked' : '' }}>
+                            <label class="custom-control-label" for="become_an_seller"></label>
+                        </div>
+                        @error('become_an_seller')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                        @enderror
+                    </div>
+
 
                 <button class="btn btn-success btn-block btn-lg" type="submit">Save Changes</button>
             </form>

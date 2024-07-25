@@ -221,6 +221,7 @@ private function generateUniqueName($name, $user_id)
         $users->online_status = $request->online_status;
         $users->profile_verified = $request->profile_verified;
         $users->cover_img_verified = $request->cover_img_verified;
+        $users->become_an_seller = $request->become_an_seller;
         $users->points = $request->points;
         $users->total_points = $request->total_points;
         $users->datetime = now();
