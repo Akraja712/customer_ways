@@ -44,7 +44,7 @@ class UsersController extends Controller
         // Retrieve all users if there's no search query
         $users = $query->latest()->paginate(10);
      
-        return view('users.index', compact('users'));
+        return view('users.index')->with('users', $users);
     }
   
 
@@ -128,7 +128,7 @@ if ($request->hasFile('cover_img')) {
             'message_notify' => $request->message_notify,
             'add_friend_notify' => $request->add_friend_notify,
             'view_notify' => $request->view_notify,
-            'introduction' => $request->introduction,
+            'dob' => $request->dob,
             'profile' => $imageName, // Save only the image name in the database
             'datetime' => now(),
             'last_seen' => now(),
@@ -174,7 +174,7 @@ private function generateUniqueName($name, $user_id)
      */
     public function edit(Users $users)
     {
-        return view('users.edit');
+        return view('users.edit', compact('users'));
     }
 
     /**
@@ -217,7 +217,7 @@ private function generateUniqueName($name, $user_id)
         $users->message_notify = $request->message_notify;
         $users->add_friend_notify = $request->add_friend_notify;
         $users->view_notify = $request->view_notify;
-        $users->introduction = $request->introduction;
+        $users->dob = $request->dob;
         $users->online_status = $request->online_status;
         $users->profile_verified = $request->profile_verified;
         $users->cover_img_verified = $request->cover_img_verified;

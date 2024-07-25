@@ -57,6 +57,10 @@ class AuthController extends Controller
             $response['message'] = 'mobile not registered.';
             return response()->json($response, 404);
         }
+        // Calculate age using current date
+    $currentDate = Carbon::now(); // Get the current date
+    $dob = Carbon::parse($user->dob); // Parse the date of birth
+    $age = $dob->diffInYears($currentDate); // Calculate age using diffInYears
 
     // Image URL
     $imageUrl = asset('storage/app/public/users/' . $user->profile);
@@ -71,6 +75,8 @@ class AuthController extends Controller
             'name' => $user->name,
             'unique_name' => $user->unique_name,
             'mobile' => $user->mobile,
+            'dob' => $user->dob,
+            'age' => $age, // Add the calculated age to the response
             'refer_code' => $user->refer_code,
             'referred_by' => $user->referred_by,
             'profile' => $imageUrl,
@@ -92,17 +98,25 @@ public function register(Request $request)
     $mobile = $request->input('mobile');
     $unique_name = $request->input('unique_name');
     $referred_by = $request->input('referred_by');
-    $introduction = $request->input('introduction');
+    $dob = $request->input('dob');
     $points = $request->input('points', 50);
     $total_points = $request->input('total_points', 50);
   
-
-    if (empty($introduction)) {
+    if (empty($dob)) {
         return response()->json([
             'success' => false,
-            'message' => 'introduction is empty.',
+            'message' => 'dob is empty.',
         ], 400);
     }
+
+    // Check if the dob matches the format YYYY-MM-DD using a regex pattern
+    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $dob)) {
+        return response()->json([
+            'success' => false,
+            'message' => 'dob format should be YYYY-MM-DD.',
+        ], 400);
+    }
+
     if (empty($mobile)) {
         $response['success'] = false;
         $response['message'] = 'mobile is empty.';
@@ -169,7 +183,7 @@ public function register(Request $request)
     $user->total_points = $total_points;
     $user->mobile = $mobile;
     $user->referred_by = $referred_by;
-    $user->introduction = $introduction;
+    $user->dob = $dob;
     $user->datetime = now(); 
     $user->last_seen = now(); 
     // Save the user
@@ -202,7 +216,7 @@ public function register(Request $request)
             'cover_img' => $coverimageUrl,
             'points' => $user->points,
             'total_points' => $user->total_points,
-            'introduction' => $user->introduction,
+            'dob' => $user->dob,
             'latitude' => $user->latitude,
             'longtitude' => $user->longtitude,
             'verified' => 0,
@@ -284,6 +298,12 @@ public function userdetails(Request $request)
 
     $user->online_status = $online_status;
     $user->save();
+
+    // Calculate age using current date
+    $currentDate = Carbon::now(); // Get the current date
+    $dob = Carbon::parse($user->dob); // Parse the date of birth
+    $age = $dob->diffInYears($currentDate); // Calculate age using diffInYears
+
     // Image URLs
     $imageUrl = asset('storage/app/public/users/' . $user->profile);
     $coverimageUrl = asset('storage/app/public/users/' . $user->cover_img);
@@ -303,7 +323,8 @@ public function userdetails(Request $request)
             'points' => $user->points,
             'verified' => $user->verified,
             'online_status' => $user->online_status, // Updated value
-            'introduction' => $user->introduction,
+            'dob' => $user->dob,
+            'age' => $age, // Add the calculated age to the response
             'message_notify' => $user->message_notify,
             'add_friend_notify' => $user->add_friend_notify,
             'view_notify' => $user->view_notify,
@@ -316,7 +337,6 @@ public function userdetails(Request $request)
         ],
     ], 200);
 }
-
 
 public function other_userdetails(Request $request)
 {
@@ -361,7 +381,7 @@ public function other_userdetails(Request $request)
             'points' => $user->points,
             'verified' => $user->verified,
             'online_status' => $user->online_status,
-            'introduction' => $user->introduction,
+            'dob' => $user->dob,
             'message_notify' => $user->message_notify,
             'add_friend_notify' => $user->add_friend_notify,
             'view_notify' => $user->view_notify,
@@ -423,7 +443,7 @@ public function update_image(Request $request)
                 'points' => $user->points,
                 'verified' => $user->verified,
                 'online_status' => $user->online_status,
-                'introduction' => $user->introduction,
+                'dob' => $user->dob,
                 'message_notify' => $user->message_notify,
                 'add_friend_notify' => $user->add_friend_notify,
                 'view_notify' => $user->view_notify,
@@ -491,7 +511,7 @@ public function update_cover_img(Request $request)
                 'points' => $user->points,
                 'verified' => $user->verified,
                 'online_status' => $user->online_status,
-                'introduction' => $user->introduction,
+                'dob' => $user->dob,
                 'message_notify' => $user->message_notify,
                 'add_friend_notify' => $user->add_friend_notify,
                 'view_notify' => $user->view_notify,
@@ -534,7 +554,7 @@ public function update_users(Request $request)
 
     $name = $request->input('name');
     $unique_name = $request->input('unique_name');
-    $introduction = $request->input('introduction');
+    $dob = $request->input('dob');
 
 
     // Validate name
@@ -557,8 +577,17 @@ public function update_users(Request $request)
     if ($unique_name !== null) {
         $user->unique_name = $unique_name;
     }
-    if ($introduction !== null) {
-        $user->introduction = $introduction;
+    if ($dob !== null) {
+        $user->dob = $dob;
+    }
+    if ($dob !== null) {
+        if (empty($dob)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'DOB is empty.',
+            ], 400);
+        }
+        $user->dob = Carbon::parse($dob)->format('Y-m-d');
     }
 
     $user->datetime = now(); 
@@ -584,7 +613,7 @@ public function update_users(Request $request)
             'points' => $user->points,
             'verified' => $user->verified,
             'online_status' => $user->online_status,
-            'introduction' => $user->introduction,
+            'dob' => $user->dob,
             'message_notify' => $user->message_notify,
             'add_friend_notify' => $user->add_friend_notify,
             'view_notify' => $user->view_notify,
@@ -2011,7 +2040,7 @@ public function friends_list(Request $request)
             'user_id' => $friend->user_id,
             'friend_user_id' => $friend->friend_user_id,
             'name' => $friendUser->name,
-            'introduction' => $friendUser->introduction,
+            'dob' => $friendUser->dob,
             'gender' => $friendUser->gender,
             'age' => $friendUser->age,
             'online_status' => $friendUser->online_status,

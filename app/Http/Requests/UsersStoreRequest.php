@@ -41,7 +41,7 @@ class UsersStoreRequest extends FormRequest
             'profile_verified' => 'nullable|boolean',
             'cover_img_verified' => 'nullable|boolean',
             'last_Seen' => 'nullable|datetime',
-            'introduction' => 'nullable|string',
+            'dob' => 'nullable|date',
         ];
     }
 }

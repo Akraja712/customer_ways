@@ -36,7 +36,18 @@
                     </span>
                     @enderror
                 </div>
-            
+                
+                <div class="form-group">
+                    <label for="dob">Date Of Birth</label>
+                    <input type="date" name="dob" class="form-control @error('dob') is-invalid @enderror" id="dob"
+                           placeholder="dob" value="{{ old('dob') }}">
+                    @error('dob')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ $message }}</strong>
+                    </span>
+                    @enderror
+                </div>
+
                 <div class="form-group">
     <label for="referred_by">Referred By</label>
     <input type="text" name="referred_by" class="form-control @error('referred_by') is-invalid @enderror" id="referred_by"
@@ -56,17 +67,6 @@
                         <label class="custom-file-label" for="profile" id="profile-label">Choose File</label>
                     </div>
                     @error('profile')
-                    <span class="invalid-feedback" role="alert">
-                        <strong>{{ $message }}</strong>
-                    </span>
-                    @enderror
-                </div>
-
-                <div class="form-group">
-                    <label for="introduction">Introduction</label>
-                    <input type="text" name="introduction" class="form-control @error('introduction') is-invalid @enderror" id="introduction"
-                           placeholder="introduction" value="{{ old('introduction') }}">
-                    @error('introduction')
                     <span class="invalid-feedback" role="alert">
                         <strong>{{ $message }}</strong>
                     </span>
