@@ -32,10 +32,10 @@
                     <label for="product_type">product Type</label>
                     <select name="product_type" class="form-control @error('product_type') is-invalid @enderror" id="product_type">
                         <option value=''>--select--</option>
-                        <option value='Road product' {{ old('product_type') == 'Road product' ? 'selected' : '' }}>Road product</option>
-                        <option value='Adventure product' {{ old('product_type') == 'Adventure product' ? 'selected' : '' }}>Adventure product</option>
-                        <option value='Explore Cities' {{ old('product_type') == 'Explore Cities' ? 'selected' : '' }}>Explore Cities</option>
-                        <option value='Airport Flyover' {{ old('product_type') == 'Airport Flyover' ? 'selected' : '' }}>Airport Flyover</option>
+                        <option value='clothing' {{ old('product_type') == 'clothing' ? 'selected' : '' }}>clothing</option>
+                        <option value='electronic' {{ old('product_type') == 'electronic' ? 'selected' : '' }}>electronic</option>
+                        <option value='jewellery' {{ old('product_type') == 'jewellery' ? 'selected' : '' }}>jewellery</option>
+                        <option value='shoes' {{ old('product_type') == 'shoes' ? 'selected' : '' }}>shoes</option>
                     </select>
                     @error('profession')
                     <span class="invalid-feedback" role="alert">
