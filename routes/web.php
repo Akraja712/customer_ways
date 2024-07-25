@@ -7,6 +7,7 @@ use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\ChatsController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\HomeController;    
+use App\Http\Controllers\SellersController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\NewsController;
@@ -72,6 +73,14 @@ Route::prefix('admin')->middleware('auth')->group(function () {
      Route::post('/products/updateStatus', [ProductsController::class, 'updateStatus'])->name('products.updateStatus');
      Route::post('/products/sendNotification', [ProductsController::class, 'sendNotification'])->name('products.sendNotification');
 
+
+      //Chats  
+      Route::get('/sellers', [SellersController::class, 'index'])->name('sellers.index');
+      Route::get('/sellers/create', [SellersController::class, 'create'])->name('sellers.create');
+      Route::get('/sellers/{sellers}/edit', [SellersController::class, 'edit'])->name('sellers.edit');
+      Route::delete('/sellers/{sellers}', [SellersController::class, 'destroy'])->name('sellers.destroy');
+      Route::put('/sellers/{sellers}', [SellersController::class, 'update'])->name('sellers.update');
+      Route::post('/sellers', [SellersController::class, 'store'])->name('sellers.store');
 
      //Chats  
      Route::get('/chats', [ChatsController::class, 'index'])->name('chats.index');

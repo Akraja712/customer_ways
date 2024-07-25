@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Users; 
 use App\Models\Chats; 
 use App\Models\Products;
+use App\Models\Sellers;
 use App\Models\Friends; 
 use App\Models\Points; 
 use App\Models\Notifications; 
@@ -1290,6 +1291,156 @@ public function delete_product(Request $request)
     ], 200);
 }
 
+public function add_sellers(Request $request)
+{
+    $your_name = $request->input('your_name'); 
+    $store_name = $request->input('store_name'); 
+    $mobile = $request->input('mobile'); 
+    $email = $request->input('email');
+    $category = $request->input('category'); 
+    $store_address = $request->input('store_address');
+
+    if (empty($your_name)) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Your Name is empty.',
+        ], 400);
+    }
+
+    // Validate chat_user_id
+    if (empty($store_name)) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Store Name is empty.',
+        ], 400);
+    }
+
+    if (empty($category)) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Category is empty.',
+        ], 400);
+    }
+    // Validate mobile number
+    if (empty($mobile)) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Mobile number is empty.',
+        ], 400);
+    } elseif (strlen($mobile) != 10 || !is_numeric($mobile)) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Mobile number should be a 10-digit numeric value.',
+        ], 400);
+    }
+
+    // Validate email format
+    if (empty($email)) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Email is empty.',
+        ], 400);
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Please enter a valid email address.',
+        ], 400);
+    }
+
+    // Create a new Feedback instance
+    $seller = new Sellers();
+    $seller->your_name = $your_name; 
+    $seller->store_name = $store_name; 
+    $seller->mobile = $mobile; 
+    $seller->email = $email; 
+    $seller->category = $category; 
+    $seller->store_address = $store_address; 
+
+    // Save the feedback
+    if (!$seller->save()) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to save sellers.',
+        ], 500);
+    }
+
+    return response()->json([
+        'success' => true,
+        'message' => 'seller added successfully.',
+    ], 201);
+}
+
+
+public function sellers_list(Request $request)
+{
+    // Get offset and limit from request with default values
+    $offset = $request->has('offset') ? $request->input('offset') : 0; // Default offset is 0 if not provided
+    $limit = $request->has('limit') ? $request->input('limit') : 10; // Default limit is 10 if not provided
+
+    // Validate offset
+    if (!is_numeric($offset)) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Offset is empty.',
+        ], 400);
+    }
+
+    // Validate limit
+    if (!is_numeric($limit)) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Limit is empty.',
+        ], 400);
+    }
+
+    // Convert offset and limit to integers
+    $offset = (int)$offset;
+    $limit = (int)$limit;
+
+    // Count total Sellers
+    $totalSellers = Sellers::count();
+
+    // If offset is beyond the total Sellers, set offset to 0
+    if ($offset >= $totalSellers) {
+        $offset = 0;
+    }
+
+    // Fetch sellers from the database with pagination
+    $sellers = Sellers::skip($offset)
+        ->take($limit)
+        ->get();
+
+    if ($sellers->isEmpty()) {
+        return response()->json([
+            'success' => false,
+            'message' => 'No Sellers found.',
+        ], 404);
+    }
+
+    $sellersDetails = [];
+
+    foreach ($sellers as $seller) {
+        $sellersDetails[] = [
+            'id' => $seller->id,
+            'your_name' => $seller->your_name,
+            'store_name' => $seller->store_name,
+            'mobile' => $seller->mobile,
+            'email' => $seller->email,
+            'category' => $seller->category,
+            'store_address' => $seller->store_address,
+            'seller_status' => $seller->seller_status,
+            'updated_at' => Carbon::parse($seller->updated_at)->format('Y-m-d H:i:s'),
+            'created_at' => Carbon::parse($seller->created_at)->format('Y-m-d H:i:s'),
+        ];
+    }   
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Seller details retrieved successfully.',
+        'total' => $totalSellers,
+        'data' => $sellersDetails,
+    ], 200);
+}
     public function add_chat(Request $request)
     {
         $user_id = $request->input('user_id'); 
