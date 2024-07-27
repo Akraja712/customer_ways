@@ -72,6 +72,7 @@
                     <th>View Notify <i class="fas fa-sort"></i></th>
                     <th>Profile Verified <i class="fas fa-sort"></i></th>
                     <th>Cover Image Verified <i class="fas fa-sort"></i></th>
+                    <th>Seller Status <i class="fas fa-sort"></i></th>
                     <th>DateTime <i class="fas fa-sort"></i></th>
                     </tr>
                 </thead>
@@ -155,6 +156,11 @@
                         <td>
                         <span class="{{ $user->cover_img_verified == 1 ? 'text-enable' : 'text-disable' }}">
                                 {{ $user->cover_img_verified == 1 ? 'Enable' : 'Disable' }}
+                            </span>
+                        </td>
+                        <td>
+                        <span class="{{ $user->seller_status == 1 ? 'text-enable' : 'text-disable' }}">
+                                {{ $user->seller_status == 1 ? 'Enable' : 'Disable' }}
                             </span>
                         </td>
                         <td>{{$user->datetime}}</td>

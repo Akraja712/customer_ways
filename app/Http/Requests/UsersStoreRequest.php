@@ -39,6 +39,7 @@ class UsersStoreRequest extends FormRequest
             'add_customer_notify' => 'nullable|boolean',
             'view_notify' => 'nullable|boolean',
             'profile_verified' => 'nullable|boolean',
+            'seller_status' => 'nullable|boolean',
             'cover_img_verified' => 'nullable|boolean',
             'last_Seen' => 'nullable|datetime',
             'dob' => 'nullable|date',

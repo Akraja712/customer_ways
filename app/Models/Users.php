@@ -15,7 +15,7 @@ class Users extends Authenticatable
 
 
     protected $fillable = [
-        'name', 'mobile', 'profile','refer_code','referred_by','datetime','points','total_points','unique_name','verified','last_seen','online_status','cover_img','dummy','dob','message_notify','add_customer_notify','view_notify','profile_verified','cover_img_verified', // Add 'mobile' to the fillable fields
+        'name', 'mobile', 'profile','refer_code','referred_by','datetime','points','total_points','unique_name','verified','last_seen','online_status','cover_img','dummy','dob','message_notify','add_customer_notify','view_notify','profile_verified','cover_img_verified','seller_status', // Add 'mobile' to the fillable fields
     ];
 
 
