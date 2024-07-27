@@ -20,9 +20,9 @@
                         <div class="form-group col-md-12">
                             <label for="status-filter">Filter by Status:</label>
                             <select name="seller_status" id="status-filter" class="form-control">
-                                <option value="0" {{ request()->input('seller_status') === '0' ? 'selected' : '' }}>Pending</option>
+                                <option value="2" {{ request()->input('seller_status') === '2' ? 'selected' : '' }}>Pending</option>
                                 <option value="1" {{ request()->input('seller_status') === '1' ? 'selected' : '' }}>Approved</option>
-                                <option value="2" {{ request()->input('seller_status') === '2' ? 'selected' : '' }}>Cancelled</option>
+                                <option value="3" {{ request()->input('seller_status') === '3' ? 'selected' : '' }}>Cancelled</option>
                             </select>
                         </div>
                     </div>
@@ -75,9 +75,9 @@
                             <td>
                                 @if ($seller->seller_status === 1)
                                     <span class="badge badge-success">Approved</span>
-                                @elseif ($seller->seller_status === 0)
-                                    <span class="badge badge-primary">Pending</span>
                                 @elseif ($seller->seller_status === 2)
+                                    <span class="badge badge-primary">Pending</span>
+                                @elseif ($seller->seller_status === 3)
                                     <span class="badge badge-danger">Cancelled</span>
                                 @endif
                             </td>

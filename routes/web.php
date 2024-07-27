@@ -12,7 +12,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\FriendsController;
+use App\Http\Controllers\CustomersController;
 use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\VerificationsController;
 use App\Http\Controllers\ProfessionsController;
@@ -48,7 +48,6 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     Route::get('/', [HomeController::class, 'index'])->name('home');
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
     Route::post('/settings', [SettingController::class, 'store'])->name('settings.store');
-    Route::resource('customers', CustomerController::class);
 
 
     //User
@@ -98,9 +97,9 @@ Route::prefix('admin')->middleware('auth')->group(function () {
       Route::put('/points/{points}', [PointsController::class, 'update'])->name('points.update');
       Route::post('/points', [PointsController::class, 'store'])->name('points.store');
 
-       //friends  
-       Route::get('/friends', [FriendsController::class, 'index'])->name('friends.index');
-       Route::delete('/friends/{friends}', [FriendsController::class, 'destroy'])->name('friends.destroy');
+       //customers  
+       Route::get('/customers', [CustomersController::class, 'index'])->name('customers.index');
+       Route::delete('/customers/{customers}', [CustomersController::class, 'destroy'])->name('customers.destroy');
 
 
         //Notifications  

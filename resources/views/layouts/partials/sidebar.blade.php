@@ -66,9 +66,9 @@
                     </a>
                 </li>
                 <li class="nav-item has-treeview">
-                    <a href="{{ route('friends.index') }}" class="nav-link {{ activeSegment('friends') }}">
+                    <a href="{{ route('customers.index') }}" class="nav-link {{ activeSegment('customers') }}">
                         <i class="nav-icon fas fa-heart"></i>
-                        <p>Friends</p>
+                        <p>Customers</p>
                     </a>
                 </li>
                 <li class="nav-item has-treeview">

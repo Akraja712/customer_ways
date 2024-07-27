@@ -102,13 +102,13 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="add_friend_notify">Add Friend Notify</label>
+                    <label for="add_customer_notify">Add Customer Notify</label>
                     <div class="custom-control custom-switch">
-                        <input type="hidden" name="add_friend_notify" value="0"> <!-- Hidden input to ensure a value is always submitted -->
-                        <input type="checkbox" name="add_friend_notify" class="custom-control-input @error('add_friend_notify') is-invalid @enderror" id="add_friend_notify" value="1" {{ old('add_friend_notify') ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="add_friend_notify"></label>
+                        <input type="hidden" name="add_customer_notify" value="0"> <!-- Hidden input to ensure a value is always submitted -->
+                        <input type="checkbox" name="add_customer_notify" class="custom-control-input @error('add_customer_notify') is-invalid @enderror" id="add_customer_notify" value="1" {{ old('add_customer_notify') ? 'checked' : '' }}>
+                        <label class="custom-control-label" for="add_customer_notify"></label>
                     </div>
-                    @error('add_friend_notify')
+                    @error('add_customer_notify')
                     <span class="invalid-feedback" role="alert">
                         <strong>{{ $message }}</strong>
                     </span>

@@ -208,13 +208,13 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="add_friend_notify">Add Friend Notify</label>
+                        <label for="add_customer_notify">Add Customer Notify</label>
                         <div class="custom-control custom-switch">
-                            <input type="hidden" name="add_friend_notify" value="0"> <!-- Hidden input to ensure a value is always submitted -->
-                            <input type="checkbox" name="add_friend_notify" class="custom-control-input @error('add_friend_notify') is-invalid @enderror" id="add_friend_notify" value="1" {{ old('add_friend_notify', $users->add_friend_notify) == '1' ? 'checked' : '' }}>
-                            <label class="custom-control-label" for="add_friend_notify"></label>
+                            <input type="hidden" name="add_customer_notify" value="0"> <!-- Hidden input to ensure a value is always submitted -->
+                            <input type="checkbox" name="add_customer_notify" class="custom-control-input @error('add_customer_notify') is-invalid @enderror" id="add_customer_notify" value="1" {{ old('add_customer_notify', $users->add_customer_notify) == '1' ? 'checked' : '' }}>
+                            <label class="custom-control-label" for="add_customer_notify"></label>
                         </div>
-                        @error('add_friend_notify')
+                        @error('add_customer_notify')
                         <span class="invalid-feedback" role="alert">
                             <strong>{{ $message }}</strong>
                         </span>
@@ -258,20 +258,6 @@
                             <label class="custom-control-label" for="cover_img_verified"></label>
                         </div>
                         @error('cover_img_verified')
-                        <span class="invalid-feedback" role="alert">
-                            <strong>{{ $message }}</strong>
-                        </span>
-                        @enderror
-                    </div>
-
-                    <div class="form-group">
-                        <label for="become_an_seller">Become An Seller</label>
-                        <div class="custom-control custom-switch">
-                            <input type="hidden" name="become_an_seller" value="0"> <!-- Hidden input to ensure a value is always submitted -->
-                            <input type="checkbox" name="become_an_seller" class="custom-control-input @error('become_an_seller') is-invalid @enderror" id="become_an_seller" value="1" {{ old('become_an_seller', $users->become_an_seller) == '1' ? 'checked' : '' }}>
-                            <label class="custom-control-label" for="become_an_seller"></label>
-                        </div>
-                        @error('become_an_seller')
                         <span class="invalid-feedback" role="alert">
                             <strong>{{ $message }}</strong>
                         </span>

@@ -68,11 +68,10 @@
                     <th>Online Status <i class="fas fa-sort"></i></th>
                     <th>Dummy <i class="fas fa-sort"></i></th>
                     <th>Message Notify <i class="fas fa-sort"></i></th>
-                    <th>Add Friend Notify <i class="fas fa-sort"></i></th>
+                    <th>Add Customer Notify <i class="fas fa-sort"></i></th>
                     <th>View Notify <i class="fas fa-sort"></i></th>
                     <th>Profile Verified <i class="fas fa-sort"></i></th>
                     <th>Cover Image Verified <i class="fas fa-sort"></i></th>
-                    <th>Become An Seller <i class="fas fa-sort"></i></th>
                     <th>DateTime <i class="fas fa-sort"></i></th>
                     </tr>
                 </thead>
@@ -136,8 +135,8 @@
                         </td>
 
                         <td>
-                        <span class="{{ $user->add_friend_notify == 1 ? 'text-enable' : 'text-disable' }}">
-                                {{ $user->add_friend_notify == 1 ? 'Enable' : 'Disable' }}
+                        <span class="{{ $user->add_customer_notify == 1 ? 'text-enable' : 'text-disable' }}">
+                                {{ $user->add_customer_notify == 1 ? 'Enable' : 'Disable' }}
                             </span>
                         </td>
 
@@ -156,11 +155,6 @@
                         <td>
                         <span class="{{ $user->cover_img_verified == 1 ? 'text-enable' : 'text-disable' }}">
                                 {{ $user->cover_img_verified == 1 ? 'Enable' : 'Disable' }}
-                            </span>
-                        </td>
-                        <td>
-                        <span class="{{ $user->become_an_seller == 1 ? 'text-enable' : 'text-disable' }}">
-                                {{ $user->become_an_seller == 1 ? 'Enable' : 'Disable' }}
                             </span>
                         </td>
                         <td>{{$user->datetime}}</td>

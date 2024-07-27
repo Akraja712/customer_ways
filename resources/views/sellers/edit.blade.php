@@ -63,22 +63,31 @@
                     </span>
                     @enderror
                 </div>
-
                 <div class="form-group">
-                        <label for="category">Select Category</label>
-                        <select name="category" class="form-control @error('category') is-invalid @enderror" id="profession">
-                            <option value=''>--select--</option>
-                            <option value='clothing' {{ old('category', $sellers->category) == 'clothing' ? 'selected' : '' }}>clothing</option>
-                            <option value='electronic' {{ old('category', $sellers->category) == 'electronic' ? 'selected' : '' }}>electronic</option>
-                            <option value='jewellery' {{ old('category', $sellers->category) == 'jewellery' ? 'selected' : '' }}>jewellery</option>
-                            <option value='shoes' {{ old('category', $sellers->category) == 'shoes' ? 'selected' : '' }}>shoes</option>
-                        </select>
-                        @error('category')
-                        <span class="invalid-feedback" role="alert">
-                            <strong>{{ $message }}</strong>
-                        </span>
-                        @enderror
-                    </div>
+                    <label for="category">Select Category</label>
+                    <select name="category" class="form-control @error('category') is-invalid @enderror" id="profession">
+                        <option value=''>--select--</option>
+                        <option value='clothing' {{ strtolower(old('category', $sellers->category)) == 'clothing' ? 'selected' : '' }}>
+                            Clothing
+                        </option>
+                        <option value='electronic' {{ strtolower(old('category', $sellers->category)) == 'electronic' ? 'selected' : '' }}>
+                            Electronic
+                        </option>
+                        <option value='jewellery' {{ strtolower(old('category', $sellers->category)) == 'jewellery' ? 'selected' : '' }}>
+                            Jewellery
+                        </option>
+                        <option value='shoes' {{ strtolower(old('category', $sellers->category)) == 'shoes' ? 'selected' : '' }}>
+                            Shoes
+                        </option>
+                    </select>
+                    @error('category')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ $message }}</strong>
+                    </span>
+                    @enderror
+                </div>
+
+
 
                 <div class="form-group">
                     <label for="store_address">Store Address</label>
@@ -99,11 +108,11 @@
                         <label class="btn btn-outline-success {{ old('seller_status', $sellers->seller_status) === 1 ? 'active' : '' }}">
                             <input type="radio" name="seller_status" id="status_activated" value="1" {{ old('seller_status', $sellers->seller_status) === 1 ? 'checked' : '' }}> Approved
                         </label>
-                        <label class="btn btn-outline-primary {{ old('seller_status', $sellers->seller_status) === 0 ? 'active' : '' }}">
-                            <input type="radio" name="seller_status" id="status_pending" value="0" {{ old('seller_status', $sellers->seller_status) === 0 ? 'checked' : '' }}> Pending
+                        <label class="btn btn-outline-primary {{ old('seller_status', $sellers->seller_status) === 2 ? 'active' : '' }}">
+                            <input type="radio" name="seller_status" id="status_pending" value="2" {{ old('seller_status', $sellers->seller_status) === 2 ? 'checked' : '' }}> Pending
                         </label>
-                        <label class="btn btn-outline-danger {{ old('seller_status', $sellers->seller_status) === 2 ? 'active' : '' }}">
-                            <input type="radio" name="seller_status" id="status_cancelled" value="2" {{ old('seller_status', $sellers->seller_status) === 2 ? 'checked' : '' }}> Cancelled
+                        <label class="btn btn-outline-danger {{ old('seller_status', $sellers->seller_status) === 3 ? 'active' : '' }}">
+                            <input type="radio" name="seller_status" id="status_cancelled" value="3" {{ old('seller_status', $sellers->seller_status) === 3 ? 'checked' : '' }}> Cancelled
                         </label>
                     </div>
                     @error('seller_status')

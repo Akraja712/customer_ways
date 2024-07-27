@@ -4,14 +4,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 
-class Friends extends Model
+class Customers extends Model
 {
     use Notifiable;
 
-    protected $table = 'friends';
+    protected $table = 'customers';
 
     protected $fillable = [
-        'friend_user_id', 'user_id', 'datetime','status',
+        'customer_user_id', 'user_id', 'datetime','status',
     ];
 
     public function user()
@@ -19,9 +19,9 @@ class Friends extends Model
         return $this->belongsTo(Users::class, 'user_id');
     }
     
-    public function friendUser()
+    public function customerUser()
     {
-        return $this->belongsTo(Users::class, 'friend_user_id');
+        return $this->belongsTo(Users::class, 'customer_user_id');
     }
 }
 

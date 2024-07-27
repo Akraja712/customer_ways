@@ -30,7 +30,7 @@ class SellersController extends Controller
             $query->where('seller_status', $seller_status);
         } else {
             // By default, fetch pending products
-            $query->where('seller_status', 0);
+            $query->where('seller_status', 2);
         }
         $sellers = $query->latest()->paginate(10); // Paginate the results
 

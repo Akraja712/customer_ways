@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Friends;
+use App\Models\Customers;
 use App\Models\Users;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Pagination\LengthAwarePaginator;
 
-class FriendsController extends Controller
+class CustomersController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Friends::query()->with('user'); // Eager load the user relationship
+        $query = Customers::query()->with('user'); // Eager load the user relationship
 
         // Filter by user if user_id is provided
         if ($request->has('user_id')) {
@@ -20,16 +20,16 @@ class FriendsController extends Controller
             $query->where('user_id', $user_id);
         }
 
-        $friends = $query->latest()->paginate(10); // Paginate the results
+        $customers = $query->latest()->paginate(10); // Paginate the results
 
         $users = Users::all(); // Fetch all users for the filter dropdown
 
-        return view('friends.index', compact('friends', 'users')); // Pass friends and users to the view
+        return view('customers.index', compact('customers', 'users')); // Pass customers and users to the view
     }
 
-    public function destroy(Friends $friends)
+    public function destroy(Customers $customers)
     {
-        $friends->delete();
+        $customers->delete();
 
         return response()->json([
             'success' => true,

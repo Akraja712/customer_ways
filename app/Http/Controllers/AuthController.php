@@ -8,7 +8,7 @@ use App\Models\Users;
 use App\Models\Chats; 
 use App\Models\Products;
 use App\Models\Sellers;
-use App\Models\Friends; 
+use App\Models\Customers; 
 use App\Models\Points; 
 use App\Models\Notifications; 
 use App\Models\Verifications; 
@@ -85,7 +85,6 @@ class AuthController extends Controller
             'points' => $user->points,
             'verified' => $user->verified,
             'online_status' => $user->online_status,
-            'become_an_seller' => $user->become_an_seller,
             'last_seen' => Carbon::parse($user->last_seen)->format('Y-m-d H:i:s'),
             'datetime' => Carbon::parse($user->datetime)->format('Y-m-d H:i:s'),
             'updated_at' => Carbon::parse($user->updated_at)->format('Y-m-d H:i:s'),
@@ -224,11 +223,10 @@ public function register(Request $request)
             'verified' => 0,
             'online_status' => 0,
             'message_notify' => 1,
-            'add_friend_notify' => 1,
+            'add_customer_notify' => 1,
             'view_notify' => 1,
             'profile_verified' => 0,
             'cover_img_verified' => 0,
-            'become_an_seller' => 0,
             'last_seen' => Carbon::parse($user->last_seen)->format('Y-m-d H:i:s'),
             'datetime' => Carbon::parse($user->datetime)->format('Y-m-d H:i:s'),
                 'updated_at' => Carbon::parse($user->updated_at)->format('Y-m-d H:i:s'),
@@ -329,11 +327,10 @@ public function userdetails(Request $request)
             'dob' => $user->dob,
             'age' => $age, // Add the calculated age to the response
             'message_notify' => $user->message_notify,
-            'add_friend_notify' => $user->add_friend_notify,
+            'add_customer_notify' => $user->add_customer_notify,
             'view_notify' => $user->view_notify,
             'profile_verified' => $user->profile_verified,
             'cover_img_verified' => $user->cover_img_verified,
-            'become_an_seller' => $user->become_an_seller,
             'last_seen' => Carbon::parse($user->last_seen)->format('Y-m-d H:i:s'),
             'datetime' => Carbon::parse($user->datetime)->format('Y-m-d H:i:s'),
             'updated_at' => Carbon::parse($user->updated_at)->format('Y-m-d H:i:s'),
@@ -387,7 +384,7 @@ public function other_userdetails(Request $request)
             'online_status' => $user->online_status,
             'dob' => $user->dob,
             'message_notify' => $user->message_notify,
-            'add_friend_notify' => $user->add_friend_notify,
+            'add_customer_notify' => $user->add_customer_notify,
             'view_notify' => $user->view_notify,
             'profile_verified' => $user->profile_verified,
             'cover_img_verified' => $user->cover_img_verified,
@@ -449,7 +446,7 @@ public function update_image(Request $request)
                 'online_status' => $user->online_status,
                 'dob' => $user->dob,
                 'message_notify' => $user->message_notify,
-                'add_friend_notify' => $user->add_friend_notify,
+                'add_customer_notify' => $user->add_customer_notify,
                 'view_notify' => $user->view_notify,
                 'profile_verified' => $user->profile_verified,
                 'cover_img_verified' => $user->cover_img_verified,
@@ -517,7 +514,7 @@ public function update_cover_img(Request $request)
                 'online_status' => $user->online_status,
                 'dob' => $user->dob,
                 'message_notify' => $user->message_notify,
-                'add_friend_notify' => $user->add_friend_notify,
+                'add_customer_notify' => $user->add_customer_notify,
                 'view_notify' => $user->view_notify,
                 'profile_verified' => $user->profile_verified,
                 'cover_img_verified' => $user->cover_img_verified,
@@ -619,7 +616,7 @@ public function update_users(Request $request)
             'online_status' => $user->online_status,
             'dob' => $user->dob,
             'message_notify' => $user->message_notify,
-            'add_friend_notify' => $user->add_friend_notify,
+            'add_customer_notify' => $user->add_customer_notify,
             'view_notify' => $user->view_notify,
             'profile_verified' => $user->profile_verified,
             'cover_img_verified' => $user->cover_img_verified,
@@ -704,7 +701,7 @@ public function update_notify(Request $request)
     }
 
     $message_notify = $request->input('message_notify');
-    $add_friend_notify = $request->input('add_friend_notify');
+    $add_customer_notify = $request->input('add_customer_notify');
     $view_notify = $request->input('view_notify');
 
     if (is_null($message_notify)) {
@@ -714,10 +711,10 @@ public function update_notify(Request $request)
         ], 400);
     }
 
-    if (is_null($add_friend_notify)) {
+    if (is_null($add_customer_notify)) {
         return response()->json([
             'success' => false,
-            'message' => 'Add Friend Notify is empty.',
+            'message' => 'Add customer Notify is empty.',
         ], 400);
     }
 
@@ -731,7 +728,7 @@ public function update_notify(Request $request)
 
     // Update user location details
     $user->message_notify = $message_notify;
-    $user->add_friend_notify = $add_friend_notify;
+    $user->add_customer_notify = $add_customer_notify;
     $user->view_notify = $view_notify;
 
     $user->save();
@@ -1798,12 +1795,12 @@ public function sellers_list(Request $request)
             $lastSeenFormatted = $lastSeen->format('M jS, Y'); // Older than current year, show month, day, and year
         }
 
-        // Check if the user is a friend
-        $isFriend = Friends::where('user_id', $user_id)
-            ->where('friend_user_id', $chat->chat_user_id) // Check against notify_user_id
+        // Check if the user is a customer
+        $isCustomer = Customers::where('user_id', $user_id)
+            ->where('customer_user_id', $chat->chat_user_id) // Check against notify_user_id
             ->exists();
 
-        $friendStatus = $isFriend ? '1' : '0';  // Check if the user is a friend
+        $customerStatus = $isCustomer ? '1' : '0';  // Check if the user is a customer
 
         return [
             'id' => $chat->id,
@@ -1813,7 +1810,7 @@ public function sellers_list(Request $request)
             'profile' => $imageUrl, // Display chat_user profile
             'cover_img' => $coverImageUrl, // Display chat_user profile
             'online_status' => $chat_user->online_status, // Display chat_user online status
-            'friend' => $friendStatus,
+            'customer' => $customerStatus,
             'latest_message' => $chat->latest_message,
             'latest_msg_time' => $lastSeenFormatted,
             'msg_seen' => $chat->msg_seen,
@@ -1957,11 +1954,11 @@ public function blocked_chat(Request $request)
     ], 200);
 }
 
-public function add_friends(Request $request)
+public function add_customers(Request $request)
 {
     $user_id = $request->input('user_id'); 
-    $friend_user_id = $request->input('friend_user_id');
-    $friend = $request->input('friend');
+    $customer_user_id = $request->input('customer_user_id');
+    $customer = $request->input('customer');
 
     // Validate user_id
     if (empty($user_id)) {
@@ -1971,27 +1968,27 @@ public function add_friends(Request $request)
         ], 400);
     }
 
-    // Validate friend_user_id
-    if (empty($friend_user_id)) {
+    // Validate customer_user_id
+    if (empty($customer_user_id)) {
         return response()->json([
             'success' => false,
-            'message' => 'friend_user_id is empty.',
+            'message' => 'customer_user_id is empty.',
         ], 400);
     }
 
-    // Check if user_id and friend_user_id are the same
-    if ($user_id == $friend_user_id) {
+    // Check if user_id and customer_user_id are the same
+    if ($user_id == $customer_user_id) {
         return response()->json([
             'success' => false,
-            'message' => 'You cannot add yourself as a friend.',
+            'message' => 'You cannot add yourself as a customer.',
         ], 400);
     }
 
-    // Validate friend action
-    if (!isset($friend)) {
+    // Validate customer action
+    if (!isset($customer)) {
         return response()->json([
             'success' => false,
-            'message' => 'friend is empty.',
+            'message' => 'customer is empty.',
         ], 400);
     }
 
@@ -2004,92 +2001,92 @@ public function add_friends(Request $request)
         ], 404);
     }
 
-    // Check if friend_user exists
-    $friend_user = Users::find($friend_user_id);
-    if (!$friend_user) {
+    // Check if customer_user exists
+    $customer_user = Users::find($customer_user_id);
+    if (!$customer_user) {
         return response()->json([
             'success' => false,
-            'message' => 'friend_user not found.',
+            'message' => 'customer_user not found.',
         ], 404);
     }
 
-    if ($friend == 2) {
-        // Delete the friend relationship
-        $existingFriend = Friends::where('user_id', $user_id)
-                        ->where('friend_user_id', $friend_user_id)
+    if ($customer == 2) {
+        // Delete the customer relationship
+        $existingCustomer = Customers::where('user_id', $user_id)
+                        ->where('customer_user_id', $customer_user_id)
                         ->first();
 
-        if ($existingFriend) {
-            $existingFriend->delete();
+        if ($existingCustomer) {
+            $existingCustomer->delete();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Friend Removed successfully.',
+                'message' => 'Customer Removed successfully.',
             ], 200);
         } else {
             return response()->json([
                 'success' => false,
-                'message' => 'You Already Removed as Friend.',
+                'message' => 'You Already Removed as customer.',
             ], 404);
         }
-    } else if ($friend == 1) {
-        // Check if the friend relationship already exists
-        $existingFriend = Friends::where('user_id', $user_id)
-                                ->where('friend_user_id', $friend_user_id)
+    } else if ($customer == 1) {
+        // Check if the customer relationship already exists
+        $existingCustomer = Customers::where('user_id', $user_id)
+                                ->where('customer_user_id', $customer_user_id)
                                 ->first();
         
-        if ($existingFriend) {
+        if ($existingCustomer) {
             return response()->json([
                 'success' => false,
-                'message' => 'You have already added this friend.',
+                'message' => 'You have already added this customer.',
             ], 400);
         }
 
-        // Create a new friend instance
-        $friend = new Friends();
-        $friend->user_id = $user_id; 
-        $friend->friend_user_id = $friend_user_id;
-        $friend->status = 1;
-        $friend->datetime = now(); 
+        // Create a new customer instance
+        $customer = new Customers();
+        $customer->user_id = $user_id; 
+        $customer->customer_user_id = $customer_user_id;
+        $customer->status = 1;
+        $customer->datetime = now(); 
 
-        // Save the friend
-        if (!$friend->save()) {
+        // Save the customer
+        if (!$customer->save()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to save friend.',
+                'message' => 'Failed to save customer.',
             ], 500);
         }
 
         // Generate image URLs
-        $friendUserImageUrl = $friend_user->profile_verified == 1 ? asset('storage/app/public/users/' . $friend_user->profile) : '';
-        $friendUserCoverImageUrl = $friend_user->cover_img_verified == 1 ? asset('storage/app/public/users/' . $friend_user->cover_img) : '';
+        $customerUserImageUrl = $customer_user->profile_verified == 1 ? asset('storage/app/public/users/' . $customer_user->profile) : '';
+        $customerUserCoverImageUrl = $customer_user->cover_img_verified == 1 ? asset('storage/app/public/users/' . $customer_user->cover_img) : '';
 
         // Return success response
         return response()->json([
             'success' => true,
-            'message' => 'Friend added successfully.',
+            'message' => 'customer added successfully.',
             'data' => [
-                'id' => $friend->id,
-                'user_id' => $friend->user_id,
-                'friend_user_id' => $friend_user->id,
-                'name' => $friend_user->name,
-                'profile' => $friendUserImageUrl,
-                'cover_img' => $friendUserCoverImageUrl,
-                'status' => $friend->status == 1 ? 'Interested' : 'Not Interested',
-                'datetime' => Carbon::parse($friend->datetime)->format('Y-m-d H:i:s'),
-                'updated_at' => Carbon::parse($friend->updated_at)->format('Y-m-d H:i:s'),
-                'created_at' => Carbon::parse($friend->created_at)->format('Y-m-d H:i:s'),
+                'id' => $customer->id,
+                'user_id' => $customer->user_id,
+                'customer_user_id' => $customer_user->id,
+                'name' => $customer_user->name,
+                'profile' => $customerUserImageUrl,
+                'cover_img' => $customerUserCoverImageUrl,
+                'status' => $customer->status == 1 ? 'Interested' : 'Not Interested',
+                'datetime' => Carbon::parse($customer->datetime)->format('Y-m-d H:i:s'),
+                'updated_at' => Carbon::parse($customer->updated_at)->format('Y-m-d H:i:s'),
+                'created_at' => Carbon::parse($customer->created_at)->format('Y-m-d H:i:s'),
             ],
         ], 201);
     } else {
         return response()->json([
             'success' => false,
-            'message' => 'Invalid friend action.',
+            'message' => 'Invalid Customer action.',
         ], 400);
     }
 }
 
-public function friends_list(Request $request)
+public function customers_list(Request $request)
 {
     // Get the user_id from the request
     $user_id = $request->input('user_id');
@@ -2125,41 +2122,41 @@ public function friends_list(Request $request)
   $limit = (int)$limit;
   
  
-     // Fetch friends for the specific user_id from the database with pagination
-     $friendsQuery = Friends::where('user_id', $user_id);
-     $totalFriends = $friendsQuery->count(); // Get total count of friends
+     // Fetch customers for the specific user_id from the database with pagination
+     $customersQuery = Customers::where('user_id', $user_id);
+     $totalCustomers = $customersQuery->count(); // Get total count of Customers
      
-     if ($offset >= $totalFriends) {
+     if ($offset >= $totalCustomers) {
         $offset = 0;
     }
 
-     $friends = $friendsQuery->skip($offset)
+     $customers = $customersQuery->skip($offset)
          ->take($limit)
          ->get();
 
 
-    if ($friends->isEmpty()) {
+    if ($customers->isEmpty()) {
         return response()->json([
             'success' => false,
-            'message' => 'No friends found.',
+            'message' => 'No customers found.',
         ], 404);
     }
 
-    $friendDetails = $friends->map(function ($friend) use ($user_id) {
-        $user = $friend->user;
-        $friendUser = $friend->friendUser;
+    $customerDetails = $customers->map(function ($customer) use ($user_id) {
+        $user = $customer->user;
+        $customerUser = $customer->customerUser;
 
-        // Check if user and friendUser have latitude and longitude
-        if (!empty($user->latitude) && !empty($user->longtitude) && !empty($friendUser->latitude) && !empty($friendUser->longtitude)) {
-            // Calculate distance between user and friendUser
-            $distance = $this->calculateDistance((float)$user->latitude, (float)$user->longtitude, (float)$friendUser->latitude, (float)$friendUser->longtitude);
+        // Check if user and customerUser have latitude and longitude
+        if (!empty($user->latitude) && !empty($user->longtitude) && !empty($customerUser->latitude) && !empty($customerUser->longtitude)) {
+            // Calculate distance between user and customerUser
+            $distance = $this->calculateDistance((float)$user->latitude, (float)$user->longtitude, (float)$customerUser->latitude, (float)$customerUser->longtitude);
             $distanceFormatted = round($distance) . ' km'; // Round to the nearest whole number
         } else {
             $distanceFormatted = null; // Handle case where latitude or longitude is missing
         }
 
-        $imageUrl = $friendUser->profile_verified == 1 ? asset('storage/app/public/users/' . $friendUser->profile) : '';
-        $coverImageUrl = $friendUser->cover_img_verified == 1 ? asset('storage/app/public/users/' . $friendUser->cover_img) : '';
+        $imageUrl = $customerUser->profile_verified == 1 ? asset('storage/app/public/users/' . $customerUser->profile) : '';
+        $coverImageUrl = $customerUser->cover_img_verified == 1 ? asset('storage/app/public/users/' . $customerUser->cover_img) : '';
 
         // Determine the format of last_seen
         $lastSeen = Carbon::parse($user->last_seen);
@@ -2182,39 +2179,37 @@ public function friends_list(Request $request)
             $lastSeenFormatted = $lastSeen->format('M jS, Y'); // Older than current year, show month, day, and year
         }
 
-        // Check if the user is a friend
-        $isFriend = Friends::where('user_id', $user_id)
-            ->where('friend_user_id', $friendUser->id)
+        // Check if the user is a customer
+        $isCustomer = Customers::where('user_id', $user_id)
+            ->where('customer_user_id', $customerUser->id)
             ->exists();
 
-        $friendStatus = $isFriend ? '1' : '0';  // Check if the user is a friend
+        $customerStatus = $isCustomer ? '1' : '0';  // Check if the user is a customer
 
         return [
-            'id' => $friend->id,
-            'user_id' => $friend->user_id,
-            'friend_user_id' => $friend->friend_user_id,
-            'name' => $friendUser->name,
-            'dob' => $friendUser->dob,
-            'gender' => $friendUser->gender,
-            'age' => $friendUser->age,
-            'online_status' => $friendUser->online_status,
-            'friend' => $friendStatus,
+            'id' => $customer->id,
+            'user_id' => $customer->user_id,
+            'customer_user_id' => $customer->customer_user_id,
+            'name' => $customerUser->name,
+            'dob' => $customerUser->dob,
+            'online_status' => $customerUser->online_status,
+            'customer' => $customerStatus,
             'profile' => $imageUrl,
             'cover_img' => $coverImageUrl,
             'last_seen' => $lastSeenFormatted,
-            'distance' => isset($distanceFormatted) ? $distanceFormatted : null, // Distance between user and friend
-            'status' => $friend->status == 1 ? 'Interested' : 'Not Interested',
-            'datetime' => Carbon::parse($friend->datetime)->format('Y-m-d H:i:s'),
-            'updated_at' => Carbon::parse($friend->updated_at)->format('Y-m-d H:i:s'),
-            'created_at' => Carbon::parse($friend->created_at)->format('Y-m-d H:i:s'),
+            'distance' => isset($distanceFormatted) ? $distanceFormatted : '', // Distance between user and customer
+            'status' => $customer->status == 1 ? 'Interested' : 'Not Interested',
+            'datetime' => Carbon::parse($customer->datetime)->format('Y-m-d H:i:s'),
+            'updated_at' => Carbon::parse($customer->updated_at)->format('Y-m-d H:i:s'),
+            'created_at' => Carbon::parse($customer->created_at)->format('Y-m-d H:i:s'),
         ];
     });
 
     return response()->json([
         'success' => true,
-        'message' => 'Friends details listed successfully.',
-        'total' => $totalFriends,
-        'data' => $friendDetails,
+        'message' => 'Customers details listed successfully.',
+        'total' => $totalCustomers,
+        'data' => $customerDetails,
     ], 200);
 }
 
@@ -2393,12 +2388,12 @@ public function notification_list(Request $request)
             $timeDifference = $notificationTime->format('M jS, Y'); // Older than current year, show month, day, and year
         }
 
-        // Check if the user is a friend
-        $isFriend = Friends::where('user_id', $user_id)
-            ->where('friend_user_id', $notification->notify_user_id) // Check against notify_user_id
+        // Check if the user is a customer
+        $isCustomer = Customers::where('user_id', $user_id)
+            ->where('customer_user_id', $notification->notify_user_id) // Check against notify_user_id
             ->exists();
 
-        $friendStatus = $isFriend ? '1' : '0';  // Check if the user is a friend
+        $customerStatus = $isCustomer ? '1' : '0';  // Check if the user is a customer
 
         return [
             'id' => $notification->id,
@@ -2408,7 +2403,7 @@ public function notification_list(Request $request)
             'profile' => $imageUrl,
             'cover_img' => $coverImageUrl,
             'message' => $notification->message,
-            'friend' => $friendStatus,
+            'customer' => $customerStatus,
             'datetime' => $notificationTime->format('Y-m-d H:i:s'),
             'time' => $timeDifference,
             'updated_at' => Carbon::parse($notification->updated_at)->format('Y-m-d H:i:s'),
