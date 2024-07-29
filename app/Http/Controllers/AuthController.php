@@ -15,7 +15,8 @@ use App\Models\Verifications;
 use App\Models\Transaction; 
 use App\Models\Feedback; 
 use App\Models\RechargeTrans; 
-use App\Models\News; 
+use App\Models\News;
+use App\Models\Appsettings; 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 use Berkayk\OneSignal\OneSignalClient;
@@ -3008,6 +3009,37 @@ public function settings_list(Request $request)
         'success' => true,
         'message' => 'Settings listed successfully.',
         'data' => $newsData,
+    ], 200);
+}
+
+
+
+public function appsettings_list(Request $request)
+{
+    // Retrieve all news settings
+    $appsettings = Appsettings::all();
+
+    if ($appsettings->isEmpty()) {
+        return response()->json([
+            'success' => false,
+            'message' => 'No Appsettings found.',
+        ], 404);
+    }
+
+    $appsettingsData = [];
+    foreach ($appsettings as $item) {
+        $appsettingsData[] = [
+            'id' => $item->id,
+            'link' => $item->link,
+            'app_version' => $item->app_version,
+            'description' => $item->description,
+        ];
+    }
+
+    return response()->json([
+        'success' => true,
+        'message' => 'App Settings listed successfully.',
+        'data' => $appsettingsData,
     ], 200);
 }
 

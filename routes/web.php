@@ -9,6 +9,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\HomeController;    
 use App\Http\Controllers\SellersController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\AppsettingsController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\Auth\LoginController;
@@ -125,6 +126,10 @@ Route::prefix('admin')->middleware('auth')->group(function () {
         Route::get('news/1/edit', [NewsController::class, 'edit'])->name('news.edit');
         Route::post('news/1/update', [NewsController::class, 'update'])->name('news.update');
 
+        
+        Route::get('appsettings/{id}/edit', [AppsettingsController::class, 'edit'])->name('appsettings.edit');
+        Route::put('appsettings/{id}/update', [AppsettingsController::class, 'update'])->name('appsettings.update');
+        
     
         //Verifications  
         Route::get('/verifications', [VerificationsController::class, 'index'])->name('verifications.index');
