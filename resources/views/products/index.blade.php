@@ -102,7 +102,7 @@
                                     <img class="customer-img img-thumbnail img-fluid" src="{{ asset('storage/app/public/products/' . $product->product_image) }}" alt="product Image" style="max-width: 100px; max-height: 100px;">
                                 </a>
                             </td>
-                            <td>{{ optional($product->user)->name }}</td> <!-- Display user name safely -->
+                            <td>{{ optional($product->users)->name }}</td> <!-- Display user name safely -->
                             <td>{{ $product->product_type }}</td>
                             <td>{{ $product->product_title }}</td>
                             <td>{{ $product->product_description }}</td>

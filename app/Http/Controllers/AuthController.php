@@ -938,11 +938,8 @@ public function update_product(Request $request)
 
     $user_id = $request->input('user_id'); 
     $product_type = $request->input('product_type');
-    $from_date = $request->input('from_date');
-    $to_date = $request->input('to_date');
     $product_title = $request->input('product_title');
     $product_description = $request->input('product_description');
-    $location = $request->input('location');
     $product_image = $request->file('product_image');
 
     // Update product details if provided
@@ -966,24 +963,6 @@ public function update_product(Request $request)
         }
         $product->product_type = $product_type;
     }
-    if ($from_date !== null) {
-        if (empty($from_date)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'From Date is empty.',
-            ], 400);
-        }
-        $product->from_date = Carbon::parse($from_date)->format('Y-m-d');
-    }
-    if ($to_date !== null) {
-        if (empty($to_date)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'To Date is empty.',
-            ], 400);
-        }
-        $product->to_date = Carbon::parse($to_date)->format('Y-m-d');
-    }
     if ($product_title !== null) {
         if (empty($product_title)) {
             return response()->json([
@@ -1003,15 +982,6 @@ public function update_product(Request $request)
         $product->product_description = $product_description;
     }
  
-    if ($location !== null) {
-        if (empty($location)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Location is empty.',
-            ], 400);
-        }
-        $product->location = $location;
-    }
     if ($product_image !== null) {
         $imagePath = $product_image->store('products', 'public');
         $product->product_image = basename($imagePath);
@@ -1053,12 +1023,9 @@ public function update_product(Request $request)
             'unique_name' => $user->unique_name,
             'verified' => $user->verified,
             'product_type' => $product->product_type,
-            'from_date' => date('F j, Y', strtotime($product->from_date)),
-            'to_date' => date('F j, Y', strtotime($product->to_date)),
             'time' => $timeDifference, 
             'product_title' => $product->product_title,
             'product_description' => $product->product_description,
-            'location' => $product->location,
             'product_status' => $product->product_status,
             'product_image' => $imageUrl,
             'product_datetime' => Carbon::parse($product->product_datetime)->format('Y-m-d H:i:s'),
