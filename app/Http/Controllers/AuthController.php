@@ -10,6 +10,7 @@ use App\Models\Products;
 use App\Models\Sellers;
 use App\Models\Customers; 
 use App\Models\Points; 
+use App\Models\OTP; 
 use App\Models\Notifications; 
 use App\Models\Verifications; 
 use App\Models\Transaction; 
@@ -26,16 +27,26 @@ use GuzzleHttp\Client;
 
 class AuthController extends Controller
 {
- 
     public function check_mobile(Request $request)
     {
-        // Retrieve phone number from the request
+        // Retrieve inputs from the request
         $mobile = $request->input('mobile');
-
+        $otp = $request->input('otp');
+        $device_id = $request->input('device_id');
+    
+        // Validate inputs
         if (empty($mobile)) {
-            $response['success'] = false;
-            $response['message'] = 'mobile is empty.';
-            return response()->json($response, 400);
+            return response()->json([
+                'success' => false,
+                'message' => 'Mobile is empty.',
+            ], 400);
+        }
+    
+        if (empty($otp)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'OTP is empty.',
+            ], 400);
         }
     
         // Remove non-numeric characters from the phone number
@@ -43,58 +54,85 @@ class AuthController extends Controller
     
         // Check if the length of the phone number is not equal to 10
         if (strlen($mobile) !== 10) {
-            $response['success'] = false;
-            $response['message'] = "mobile number should be exactly 10 digits";
-            return response()->json($response, 400);
+            return response()->json([
+                'success' => false,
+                'message' => 'Mobile number should be exactly 10 digits.',
+            ], 400);
+        }
+    
+           // Check if a user with the given phone number exists in the database
+           $user = Users::where('mobile', $mobile)->first();
+    
+           if (!$user) {
+               return response()->json([
+                   'success' => false,
+                   'message' => 'Your Mobile Number is not registered.',
+               ], 404);
+           }
+        // Validate OTP from the database
+        $otpRecord = OTP::where('mobile', $mobile)->where('otp', $otp)->first();
+    
+        if (!$otpRecord) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid OTP.',
+            ], 400);
         }
     
     
-        // Check if a customer with the given phone number exists in the database
-        $user = Users::where('mobile', $mobile)->first();
-    
-        // If customer not found, return failure response
-        if (!$user) {
-            $response['success'] = true;
-            $response['registered'] = false;
-            $response['message'] = 'mobile not registered.';
-            return response()->json($response, 404);
+        // Update device ID if it's not already set
+        if (empty($user->device_id)) {
+            $user->device_id = $device_id;
+            $user->save();
         }
-        // Calculate age using current date
-    $currentDate = Carbon::now(); // Get the current date
-    $dob = Carbon::parse($user->dob); // Parse the date of birth
-    $age = $dob->diffInYears($currentDate); // Calculate age using diffInYears
-
-    // Image URL
-    $imageUrl = asset('storage/app/public/users/' . $user->profile);
-    $coverimageUrl = asset('storage/app/public/users/' . $user->cover_img);
-
-    return response()->json([
-        'success' => true,
-        'registered' => true,
-        'message' => 'Logged in successfully.',
-        'data' => [
-            'id' => $user->id,
-            'name' => $user->name,
-            'unique_name' => $user->unique_name,
-            'mobile' => $user->mobile,
-            'dob' => $user->dob,
-            'age' => $age, // Add the calculated age to the response
-            'refer_code' => $user->refer_code,
-            'referred_by' => $user->referred_by,
-            'profile' => $imageUrl,
-            'cover_img' => $coverimageUrl,
-            'points' => $user->points,
-            'verified' => $user->verified,
-            'online_status' => $user->online_status,
-            'seller_status' => $user->seller_status,
-            'last_seen' => Carbon::parse($user->last_seen)->format('Y-m-d H:i:s'),
-            'datetime' => Carbon::parse($user->datetime)->format('Y-m-d H:i:s'),
-            'updated_at' => Carbon::parse($user->updated_at)->format('Y-m-d H:i:s'),
-            'created_at' => Carbon::parse($user->created_at)->format('Y-m-d H:i:s'),
-        ],
-    ], 200);
-}
-
+    
+        // Verify if the device ID matches
+        $userWithDevice = Users::where('mobile', $mobile)->where('device_id', $device_id)->first();
+    
+        if (!$userWithDevice) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Device ID verification failed.',
+            ], 400);
+        }
+    
+        // Calculate age using the current date
+        $currentDate = Carbon::now();
+        $dob = Carbon::parse($user->dob);
+        $age = $dob->diffInYears($currentDate);
+    
+        // Image URLs
+        $imageUrl = asset('storage/app/public/users/' . $user->profile);
+        $coverImageUrl = asset('storage/app/public/users/' . $user->cover_img);
+    
+        // Return success response with user data
+        return response()->json([
+            'success' => true,
+            'registered' => true,
+            'message' => 'Logged in successfully.',
+            'data' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'unique_name' => $user->unique_name,
+                'mobile' => $user->mobile,
+                'dob' => $user->dob,
+                'age' => $age,
+                'refer_code' => $user->refer_code,
+                'referred_by' => $user->referred_by,
+                'profile' => $imageUrl,
+                'cover_img' => $coverImageUrl,
+                'points' => $user->points,
+                'verified' => $user->verified,
+                'online_status' => $user->online_status,
+                'seller_status' => $user->seller_status,
+                'last_seen' => Carbon::parse($user->last_seen)->format('Y-m-d H:i:s'),
+                'datetime' => Carbon::parse($user->datetime)->format('Y-m-d H:i:s'),
+                'updated_at' => Carbon::parse($user->updated_at)->format('Y-m-d H:i:s'),
+                'created_at' => Carbon::parse($user->created_at)->format('Y-m-d H:i:s'),
+            ],
+        ], 200);
+    }
+    
 public function register(Request $request)
 {
     $name = $request->input('name');
@@ -1442,6 +1480,62 @@ public function sellers_list(Request $request)
         'data' => $sellersDetails,
     ], 200);
 }
+
+public function otp(Request $request)
+{
+    $mobile = $request->input('mobile'); 
+    $datetime = date('Y-m-d H:i:s');
+    
+    // Validate mobile number
+    if (empty($mobile)) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Mobile number is empty.',
+        ], 400);
+    } elseif (strlen($mobile) != 10 || !is_numeric($mobile)) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Mobile number should be a 10-digit numeric value.',
+        ], 400);
+    }
+
+    // Generate a random OTP
+    $randomNumber = mt_rand(100000, 999999);
+
+    // Check if the mobile number already exists
+    $existingOtp = OTP::where('mobile', $mobile)->first();
+
+    if ($existingOtp) {
+        // Update existing record
+        $existingOtp->otp = $randomNumber;
+        $existingOtp->datetime = $datetime;
+        $success = $existingOtp->save();
+    } else {
+        // Create a new OTP instance
+        $otp = new OTP();
+        $otp->mobile = $mobile; 
+        $otp->otp = $randomNumber; 
+        $otp->datetime = $datetime; 
+        $success = $otp->save();
+    }
+
+    if (!$success) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to save OTP.',
+        ], 500);
+    }
+
+    // Retrieve the latest OTP data for the mobile number
+    $result = OTP::where('mobile', $mobile)->get();
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Successfully received OTP.',
+        'data' => $result,
+    ], 201);
+}
+
     public function add_chat(Request $request)
     {
         $user_id = $request->input('user_id'); 

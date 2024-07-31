@@ -23,6 +23,7 @@ Route::post('add_chat', [AuthController::class, 'add_chat']);
 Route::post('chat_list', [AuthController::class, 'chat_list']);
 Route::post('blocked_chat', [AuthController::class, 'blocked_chat']);
 Route::post('delete_chat', [AuthController::class, 'delete_chat']);
+Route::post('otp', [AuthController::class, 'otp']);
 Route::post('add_customers', [AuthController::class, 'add_customers']);
 Route::post('customers_list', [AuthController::class, 'customers_list']);
 Route::post('add_notifications', [AuthController::class, 'add_notifications']);
