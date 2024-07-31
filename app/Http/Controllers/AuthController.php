@@ -32,7 +32,7 @@ class AuthController extends Controller
         // Retrieve inputs from the request
         $mobile = $request->input('mobile');
         $otp = $request->input('otp');
-    
+        
         // Validate inputs
         if (empty($mobile)) {
             return response()->json([
@@ -48,7 +48,6 @@ class AuthController extends Controller
             ], 400);
         }
     
-    
         // Remove non-numeric characters from the phone number
         $mobile = preg_replace('/[^0-9]/', '', $mobile);
     
@@ -60,17 +59,7 @@ class AuthController extends Controller
             ], 400);
         }
     
-          // Check if a user with the given phone number exists in the database
-          $user = Users::where('mobile', $mobile)->first();
-    
-          if (!$user) {
-              return response()->json([
-                  'success' => false,
-                  'message' => 'Your mobile number is not registered.',
-              ], 404);
-          }
-
-        // Validate OTP from the database
+        // Check if OTP is valid
         $otpRecord = OTP::where('mobile', $mobile)->where('otp', $otp)->first();
     
         if (!$otpRecord) {
@@ -80,6 +69,22 @@ class AuthController extends Controller
             ], 400);
         }
     
+        // Check if the user with the given phone number exists in the database
+        $user = Users::where('mobile', $mobile)->first();
+    
+        if (!$user) {
+            // Create a new user with the provided mobile number if it doesn't exist
+            $user = new Users();
+            $user->mobile = $mobile;
+            $user->name ="";
+            $user->dob = now(); // Placeholder date of birth, should be updated based on your requirements
+            $user->points = 0; // Default points
+            $user->total_points = 0; // Default total points
+            $user->refer_code = ""; // Generate refer code
+            $user->datetime = now();
+            $user->last_seen = now();
+            $user->save();
+        }
     
         // Calculate age using the current date
         $currentDate = Carbon::now();
@@ -101,7 +106,6 @@ class AuthController extends Controller
                 'unique_name' => $user->unique_name,
                 'mobile' => $user->mobile,
                 'dob' => $user->dob,
-                'age' => $age,
                 'refer_code' => $user->refer_code,
                 'referred_by' => $user->referred_by,
                 'profile' => $imageUrl,
@@ -118,187 +122,184 @@ class AuthController extends Controller
         ], 200);
     }
     
-public function register(Request $request)
-{
-    $name = $request->input('name');
-    $mobile = $request->input('mobile');
-    $unique_name = $request->input('unique_name');
-    $referred_by = $request->input('referred_by');
-    $dob = $request->input('dob');
-    $points = $request->input('points', 50);
-    $total_points = $request->input('total_points', 50);
-  
-    if (empty($dob)) {
-        return response()->json([
-            'success' => false,
-            'message' => 'dob is empty.',
-        ], 400);
-    }
-
-    // Check if the dob matches the format YYYY-MM-DD using a regex pattern
-    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $dob)) {
-        return response()->json([
-            'success' => false,
-            'message' => 'dob format should be YYYY-MM-DD.',
-        ], 400);
-    }
-
-    if (empty($mobile)) {
-        $response['success'] = false;
-        $response['message'] = 'mobile is empty.';
-        return response()->json($response, 400);
-    }
-
-    // Remove non-numeric characters from the phone number
-    $mobile = preg_replace('/[^0-9]/', '', $mobile);
-
-    // Check if the length of the phone number is not equal to 10
-    if (strlen($mobile) !== 10) {
-        $response['success'] = false;
-        $response['message'] = "mobile number should be exactly 10 digits";
-        return response()->json($response, 400);
-    }
+    
  
-    if (empty($name)) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Name is empty.',
-        ], 400);
-    } elseif (strlen($name) < 4 || strlen($name) > 18) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Name should be between 4 and 18 characters.',
-        ], 400);
-    }
-
-   
-    $existingUser = Users::where('unique_name', $unique_name)->first();
-    if ($existingUser) {
-        return response()->json([
-            'success' => false,
-            'message' => 'User already exists with this Unique Name.',
-        ], 409);
-    }
-
-    // Check if the user with the given email already exists
-    $existingMobile = Users::where('mobile', $mobile)->first();
-    if ($existingMobile) {
-        return response()->json([
-            'success' => false,
-            'message' => 'User already exists with this Mobile.',
-        ], 409);
-    }
-    // Generate a refer_code automatically
-    $refer_code = $this->generateReferCode();
-
-    // If referred_by is provided, validate it
-    if (!empty($referred_by)) {
-        $validReferredBy = Users::where('refer_code', $referred_by)->exists();
-        if (!$validReferredBy) {
+    
+    public function register(Request $request)
+    {
+        $user_id = $request->input('user_id');
+        $name = $request->input('name');
+        $unique_name = $request->input('unique_name');
+        $referred_by = $request->input('referred_by');
+        $dob = $request->input('dob');
+        $points = $request->input('points', 50);
+        $total_points = $request->input('total_points', 50);
+    
+        if (empty($user_id)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Invalid referred_by.',
+                'message' => 'user_id is required.',
             ], 400);
         }
-    }
-
-    $user = new Users();
-    $user->name = $name;
-    $user->refer_code = $this->generateReferCode();
-    $user->points = $points;
-    $user->total_points = $total_points;
-    $user->mobile = $mobile;
-    $user->referred_by = $referred_by;
-    $user->dob = $dob;
-    $user->datetime = now(); 
-    $user->last_seen = now(); 
-    // Save the user
-    $user->save();
-
-    // Retrieve the user's id
-    $user_id = $user->id;
-
-    // Generate unique_name based on name and user's id
-    $unique_name = $this->generateUniqueName($name, $user_id);
-    $user->unique_name = $unique_name;
-    $user->save();
-
-
-    // Image URL
-    $imageUrl = asset('storage/app/public/users/' . $user->profile);
-    $coverimageUrl = asset('storage/app/public/users/' . $user->cover_img);
-
-    return response()->json([
-        'success' => true,
-        'message' => 'User registered successfully.',
-        'data' => [
-            'id' => $user->id,
-            'name' => $user->name,
-            'unique_name' => $user->unique_name,
-            'mobile' => $user->mobile,
-            'refer_code' => $refer_code, // Return the generated refer_code
-            'referred_by' => $user->referred_by,
-            'profile' => $imageUrl,
-            'cover_img' => $coverimageUrl,
-            'points' => $user->points,
-            'total_points' => $user->total_points,
-            'dob' => $user->dob,
-            'latitude' => $user->latitude,
-            'longtitude' => $user->longtitude,
-            'verified' => 0,
-            'online_status' => 0,
-            'message_notify' => 1,
-            'add_customer_notify' => 1,
-            'view_notify' => 1,
-            'profile_verified' => 0,
-            'cover_img_verified' => 0,
-            'seller_status' => 0,
-            'last_seen' => Carbon::parse($user->last_seen)->format('Y-m-d H:i:s'),
-            'datetime' => Carbon::parse($user->datetime)->format('Y-m-d H:i:s'),
+    
+        if (empty($dob)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'dob is empty.',
+            ], 400);
+        }
+    
+        // Check if the dob matches the format YYYY-MM-DD using a regex pattern
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $dob)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'dob format should be YYYY-MM-DD.',
+            ], 400);
+        }
+    
+        if (empty($name)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Name is empty.',
+            ], 400);
+        } elseif (strlen($name) < 4 || strlen($name) > 18) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Name should be between 4 and 18 characters.',
+            ], 400);
+        }
+    
+        // Check if the user with the provided user_id exists
+        $user = Users::find($user_id);
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not found with the provided user_id.',
+            ], 404);
+        }
+    
+        // Generate a refer_code automatically
+        $user->refer_code = $this->generateReferCode();
+    
+        // Check if the referred_by is valid
+        if (!empty($referred_by)) {
+            $validReferredBy = Users::where('refer_code', $referred_by)->exists();
+            if (!$validReferredBy) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid referred_by.',
+                ], 400);
+            }
+        }
+    
+        // Update user information
+        $user->name = $name;
+        $user->points = $points;
+        $user->total_points = $total_points;
+        $user->dob = $dob;
+        $user->referred_by = $referred_by;
+        $user->last_seen = now(); // Update last_seen to current time
+        $user->datetime = now(); // Update datetime to current time
+    
+        // Save the user with initial information
+        try {
+            $user->save();
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating user data: ' . $e->getMessage(),
+            ], 500);
+        }
+    
+        // Generate unique_name based on name and user's id
+        $unique_name = $this->generateUniqueName($name, $user_id);
+        $user->unique_name = $unique_name;
+    
+        // Save the user again to update the unique_name
+        try {
+            $user->save();
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating unique_name: ' . $e->getMessage(),
+            ], 500);
+        }
+    
+        // Image URL
+        $imageUrl = asset('storage/app/public/users/' . $user->profile);
+        $coverimageUrl = asset('storage/app/public/users/' . $user->cover_img);
+    
+        return response()->json([
+            'success' => true,
+            'message' => 'User registered successfully.',
+            'data' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'unique_name' => $user->unique_name,
+                'mobile' => $user->mobile,
+                'refer_code' => $user->refer_code,
+                'referred_by' => $user->referred_by,
+                'profile' => $imageUrl,
+                'cover_img' => $coverimageUrl,
+                'points' => $user->points,
+                'total_points' => $user->total_points,
+                'dob' => $user->dob,
+                'latitude' => $user->latitude,
+                'longitude' => $user->longitude,
+                'verified' => $user->verified,
+                'online_status' => $user->online_status,
+                'message_notify' => $user->message_notify,
+                'add_customer_notify' => $user->add_customer_notify,
+                'view_notify' => $user->view_notify,
+                'profile_verified' => $user->profile_verified,
+                'cover_img_verified' => $user->cover_img_verified,
+                'seller_status' => $user->seller_status,
+                'last_seen' => Carbon::parse($user->last_seen)->format('Y-m-d H:i:s'),
+                'datetime' => Carbon::parse($user->datetime)->format('Y-m-d H:i:s'),
                 'updated_at' => Carbon::parse($user->updated_at)->format('Y-m-d H:i:s'),
                 'created_at' => Carbon::parse($user->created_at)->format('Y-m-d H:i:s'),
-        ],
-    ], 201);
-}
-
-private function generateUniqueName($name, $user_id)
-{
-    // Remove spaces and convert the name to lowercase
-    $name = strtolower(str_replace(' ', '', $name));
-
-    // Extract the first part of the user's name and limit to first 8 characters
-    $firstPart = substr($name, 0, 8);
-
-    // Generate the unique name by concatenating the first part with the user's id
-    $unique_name = $firstPart . $user_id;
-
-    // Check if the generated unique_name is already in use
-    $counter = 1;
-    while (Users::where('unique_name', $unique_name)->exists()) {
-        // If it is, append a counter to make it unique
-        $unique_name = $firstPart . $user_id . $counter;
-        $counter++;
+            ],
+        ], 200);
     }
-
-    return $unique_name;
-}
-
-private function generateReferCode()
-{
-    // Generate a random string
-    $characters = array_merge(range('A', 'Z'), range('a', 'z'), range(0, 9));
-    shuffle($characters);
-    $refer_code = implode('', array_slice($characters, 0, 6));
-
-    // Check if the generated refer_code already exists in the database
-    // If it does, regenerate the refer_code until it's unique
-    while (Users::where('refer_code', $refer_code)->exists()) {
+    
+    private function generateUniqueName($name, $user_id)
+    {
+        // Remove spaces and convert the name to lowercase
+        $name = strtolower(str_replace(' ', '', $name));
+    
+        // Extract the first part of the user's name and limit to first 8 characters
+        $firstPart = substr($name, 0, 8);
+    
+        // Generate the unique name by concatenating the first part with the user's id
+        $unique_name = $firstPart . $user_id;
+    
+        // Check if the generated unique_name is already in use
+        $counter = 1;
+        while (Users::where('unique_name', $unique_name)->exists()) {
+            // If it is, append a counter to make it unique
+            $unique_name = $firstPart . $user_id . $counter;
+            $counter++;
+        }
+    
+        return $unique_name;
+    }
+    
+    private function generateReferCode()
+    {
+        // Generate a random string for refer_code
+        $characters = array_merge(range('A', 'Z'), range('a', 'z'), range(0, 9));
         shuffle($characters);
         $refer_code = implode('', array_slice($characters, 0, 6));
+    
+        // Check if the generated refer_code already exists in the database
+        while (Users::where('refer_code', $refer_code)->exists()) {
+            shuffle($characters);
+            $refer_code = implode('', array_slice($characters, 0, 6));
+        }
+    
+        return $refer_code;
     }
-
-    return $refer_code;
-}
+    
 
 public function userdetails(Request $request)
 {
