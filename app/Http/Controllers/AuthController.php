@@ -77,10 +77,12 @@ class AuthController extends Controller
             $user = new Users();
             $user->mobile = $mobile;
             $user->name ="";
+            $user->unique_name ="";
             $user->dob = now(); // Placeholder date of birth, should be updated based on your requirements
             $user->points = 0; // Default points
             $user->total_points = 0; // Default total points
             $user->refer_code = ""; // Generate refer code
+            $user->referred_by = ""; // Generate refer code
             $user->datetime = now();
             $user->last_seen = now();
             $user->save();
@@ -111,9 +113,9 @@ class AuthController extends Controller
                 'profile' => $imageUrl,
                 'cover_img' => $coverImageUrl,
                 'points' => $user->points,
-                'verified' => $user->verified,
-                'online_status' => $user->online_status,
-                'seller_status' => $user->seller_status,
+                'verified'  => 0,
+                'online_status'  => 0,
+                'seller_status' => 0,
                 'last_seen' => Carbon::parse($user->last_seen)->format('Y-m-d H:i:s'),
                 'datetime' => Carbon::parse($user->datetime)->format('Y-m-d H:i:s'),
                 'updated_at' => Carbon::parse($user->updated_at)->format('Y-m-d H:i:s'),
@@ -238,14 +240,14 @@ class AuthController extends Controller
                 'unique_name' => $user->unique_name,
                 'mobile' => $user->mobile,
                 'refer_code' => $user->refer_code,
-                'referred_by' => $user->referred_by,
+                'referred_by' => $user ? ($user->referred_by ?? "") : "",
                 'profile' => $imageUrl,
                 'cover_img' => $coverimageUrl,
                 'points' => $user->points,
                 'total_points' => $user->total_points,
                 'dob' => $user->dob,
-                'latitude' => $user->latitude,
-                'longitude' => $user->longitude,
+               'latitude' => $user ? ($user->latitude ?? "") : "",
+               'longtitude' => $user ? ($user->longtitude ?? "") : "",
                 'verified' => $user->verified,
                 'online_status' => $user->online_status,
                 'message_notify' => $user->message_notify,
@@ -345,7 +347,7 @@ public function userdetails(Request $request)
             'unique_name' => $user->unique_name,
             'mobile' => $user->mobile,
             'refer_code' => $user->refer_code,
-            'referred_by' => $user->referred_by,
+            'referred_by' => $user ? ($user->referred_by ?? "") : "",
             'profile' => $imageUrl,
             'cover_img' => $coverimageUrl,
             'points' => $user->points,
@@ -404,7 +406,7 @@ public function other_userdetails(Request $request)
             'unique_name' => $user->unique_name,
             'mobile' => $user->mobile,
             'refer_code' => $user->refer_code,
-            'referred_by' => $user->referred_by,
+            'referred_by' => $user ? ($user->referred_by ?? "") : "",
             'profile' => $imageUrl,
             'cover_img' => $coverImageUrl,
             'points' => $user->points,
@@ -466,7 +468,7 @@ public function update_image(Request $request)
                 'unique_name' => $user->unique_name,
                 'mobile' => $user->mobile,
                 'refer_code' => $user->refer_code,
-                'referred_by' => $user->referred_by,
+                'referred_by' => $user ? ($user->referred_by ?? "") : "",
                 'profile' => $imageUrl,
                 'cover_img' => $coverimageUrl,
                 'points' => $user->points,
@@ -534,7 +536,7 @@ public function update_cover_img(Request $request)
                 'unique_name' => $user->unique_name,
                 'mobile' => $user->mobile,
                 'refer_code' => $user->refer_code,
-                'referred_by' => $user->referred_by,
+                'referred_by' => $user ? ($user->referred_by ?? "") : "",
                 'profile' => $imageUrl,
                 'cover_img' => $coverimageUrl,
                 'points' => $user->points,
@@ -636,7 +638,7 @@ public function update_users(Request $request)
             'unique_name' => $user->unique_name,
             'mobile' => $user->mobile,
             'refer_code' => $user->refer_code,
-            'referred_by' => $user->referred_by,
+            'referred_by' => $user ? ($user->referred_by ?? "") : "",
             'profile' => $imageUrl,
             'cover_img' => $coverimageUrl,
             'points' => $user->points,

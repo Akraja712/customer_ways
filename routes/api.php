@@ -13,6 +13,7 @@ Route::post('update_image', [AuthController::class, 'update_image']);
 Route::post('update_cover_img', [AuthController::class, 'update_cover_img']);
 Route::post('update_users', [AuthController::class, 'update_users']);
 Route::post('update_notify', [AuthController::class, 'update_notify']);
+Route::post('add_product', [AuthController::class, 'add_product']);
 Route::post('product_list', [AuthController::class, 'product_list']);
 Route::post('my_product_list', [AuthController::class, 'my_product_list']);
 Route::post('recommend_product_list', [AuthController::class, 'recommend_product_list']);
