@@ -32,7 +32,6 @@ class AuthController extends Controller
         // Retrieve inputs from the request
         $mobile = $request->input('mobile');
         $otp = $request->input('otp');
-        $device_id = $request->input('device_id');
     
         // Validate inputs
         if (empty($mobile)) {
@@ -49,6 +48,7 @@ class AuthController extends Controller
             ], 400);
         }
     
+    
         // Remove non-numeric characters from the phone number
         $mobile = preg_replace('/[^0-9]/', '', $mobile);
     
@@ -60,15 +60,16 @@ class AuthController extends Controller
             ], 400);
         }
     
-           // Check if a user with the given phone number exists in the database
-           $user = Users::where('mobile', $mobile)->first();
+          // Check if a user with the given phone number exists in the database
+          $user = Users::where('mobile', $mobile)->first();
     
-           if (!$user) {
-               return response()->json([
-                   'success' => false,
-                   'message' => 'Your Mobile Number is not registered.',
-               ], 404);
-           }
+          if (!$user) {
+              return response()->json([
+                  'success' => false,
+                  'message' => 'Your mobile number is not registered.',
+              ], 404);
+          }
+
         // Validate OTP from the database
         $otpRecord = OTP::where('mobile', $mobile)->where('otp', $otp)->first();
     
@@ -79,22 +80,6 @@ class AuthController extends Controller
             ], 400);
         }
     
-    
-        // Update device ID if it's not already set
-        if (empty($user->device_id)) {
-            $user->device_id = $device_id;
-            $user->save();
-        }
-    
-        // Verify if the device ID matches
-        $userWithDevice = Users::where('mobile', $mobile)->where('device_id', $device_id)->first();
-    
-        if (!$userWithDevice) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Device ID verification failed.',
-            ], 400);
-        }
     
         // Calculate age using the current date
         $currentDate = Carbon::now();
